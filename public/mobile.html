@@ -12,71 +12,83 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
     body { background: #18040f; height: 100vh; display: flex; flex-direction: column; overflow: hidden; position: relative; }
 
-    /* Pookie Top Bar */
     .top-bar {
       position: absolute; top: 0; left: 0; right: 0; height: 68px;
       display: flex; justify-content: space-between; align-items: center;
-      padding: 0 18px; z-index: 20; background: linear-gradient(180deg, rgba(24, 4, 15, 0.95), transparent);
+      padding: 0 16px; z-index: 20; background: linear-gradient(180deg, rgba(24, 4, 15, 0.95), transparent);
     }
     .badge-live {
       display: inline-flex; align-items: center; gap: 6px; font-size: 11px;
-      text-transform: uppercase; letter-spacing: 0.5px; font-weight: 800;
-      color: #fbcfe8; background: rgba(244, 114, 182, 0.2); border: 1.5px solid #f472b6;
-      padding: 6px 13px; border-radius: 20px;
+      font-weight: 800; color: #fbcfe8; background: rgba(244, 114, 182, 0.2); border: 1.5px solid #f472b6;
+      padding: 6px 12px; border-radius: 20px;
     }
-    .dot { width: 7px; height: 7px; background: #f472b6; border-radius: 50%; box-shadow: 0 0 8px #f472b6; }
+    .dot { width: 7px; height: 7px; background: #f472b6; border-radius: 50%; }
 
-    .control-pills { display: flex; gap: 8px; }
+    .control-pills { display: flex; gap: 6px; }
     .pill-btn {
       background: rgba(255,255,255,0.14); border: 1.5px solid rgba(255,255,255,0.25);
-      color: #fff; padding: 7px 14px; border-radius: 20px; font-size: 12px; font-weight: 700;
-      cursor: pointer; backdrop-filter: blur(10px); transition: 0.2s;
+      color: #fff; padding: 7px 12px; border-radius: 20px; font-size: 11px; font-weight: 700;
+      cursor: pointer; backdrop-filter: blur(8px);
     }
-    .pill-btn.active { background: #ec4899; border-color: #f472b6; color: #fff; box-shadow: 0 0 12px rgba(236,72,153,0.6); }
+    .pill-btn.active { background: #ec4899; border-color: #f472b6; }
+    .inbox-badge { background: #3b82f6; border-color: #60a5fa; color: #fff; }
 
-    /* Viewport & Cute Viewfinder */
+    /* Viewport & Viewfinder */
     .viewport { flex: 1; position: relative; display: flex; justify-content: center; align-items: center; }
     video { width: 100%; height: 100%; object-fit: cover; }
-
-    .viewfinder {
-      position: absolute; width: 84%; height: 75%;
-      pointer-events: none; border-radius: 20px;
-    }
-    .corner {
-      position: absolute; width: 28px; height: 28px; border-color: #f472b6;
-      border-style: solid; border-width: 0; filter: drop-shadow(0 0 4px rgba(244,114,182,0.6));
-    }
+    .viewfinder { position: absolute; width: 84%; height: 75%; pointer-events: none; border-radius: 20px; }
+    .corner { position: absolute; width: 28px; height: 28px; border-color: #f472b6; border-style: solid; border-width: 0; }
     .top-left { top: 0; left: 0; border-top-width: 4px; border-left-width: 4px; border-top-left-radius: 12px; }
     .top-right { top: 0; right: 0; border-top-width: 4px; border-right-width: 4px; border-top-right-radius: 12px; }
     .bottom-left { bottom: 0; left: 0; border-bottom-width: 4px; border-left-width: 4px; border-bottom-left-radius: 12px; }
     .bottom-right { bottom: 0; right: 0; border-bottom-width: 4px; border-right-width: 4px; border-bottom-right-radius: 12px; }
 
-    /* Shutter Bar with Bubble Ring */
+    /* Shutter Bar */
     .shutter-bar {
       height: 130px; background: #18040f; display: flex;
-      flex-direction: column; justify-content: center; align-items: center; z-index: 20;
+      justify-content: space-evenly; align-items: center; z-index: 20; padding: 0 16px;
     }
+    .action-circle-btn {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: rgba(255, 255, 255, 0.12); border: 2px solid #f472b6;
+      color: #fff; font-size: 20px; display: flex; justify-content: center;
+      align-items: center; cursor: pointer;
+    }
+    .action-circle-btn:active { transform: scale(0.9); }
+
     .shutter-ring {
-      width: 80px; height: 80px; border-radius: 50%;
-      border: 3.5px solid #fbcfe8;
+      width: 78px; height: 78px; border-radius: 50%; border: 3.5px solid #fbcfe8;
       display: flex; justify-content: center; align-items: center; cursor: pointer;
-      box-shadow: 0 0 20px rgba(244, 114, 182, 0.3);
-      transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-    .shutter-ring:active { transform: scale(0.9); }
     .shutter-core {
-      width: 64px; height: 64px; border-radius: 50%;
+      width: 62px; height: 62px; border-radius: 50%;
       background: linear-gradient(135deg, #f472b6, #db2777);
-      display: flex; justify-content: center; align-items: center;
-      font-size: 22px; color: #fff;
+      display: flex; justify-content: center; align-items: center; font-size: 20px; color: #fff;
     }
 
-    /* Pookie Sweet Toast */
     #toast {
       position: absolute; bottom: 145px; left: 50%; transform: translateX(-50%);
       background: #ffffff; border: 2px solid #f472b6; color: #be185d;
-      padding: 10px 22px; border-radius: 25px; font-size: 13px; font-weight: 800;
-      display: none; z-index: 30; box-shadow: 0 6px 20px rgba(244,114,182,0.4);
+      padding: 9px 20px; border-radius: 25px; font-size: 13px; font-weight: 800;
+      display: none; z-index: 30;
+    }
+
+    /* Modal for Received Laptop Files */
+    .drawer {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(5px);
+      z-index: 100; display: none; flex-direction: column; justify-content: flex-end;
+    }
+    .drawer-content {
+      background: #fff; border-radius: 24px 24px 0 0; padding: 20px; max-height: 75vh; overflow-y: auto;
+    }
+    .drawer-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .inbox-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px; background: #fff5f8; border: 1.5px solid #fbcfe8; border-radius: 14px; margin-bottom: 10px;
+    }
+    .download-pill {
+      background: #ec4899; color: #fff; border: none; padding: 6px 14px;
+      border-radius: 20px; font-size: 12px; font-weight: 700; cursor: pointer;
     }
     canvas { display: none; }
   </style>
@@ -84,8 +96,9 @@
 <body>
 
   <div class="top-bar">
-    <div class="badge-live"><span class="dot"></span> GhostScan 🎀</div>
+    <div class="badge-live"><span class="dot"></span> GhostScan</div>
     <div class="control-pills">
+      <button class="pill-btn inbox-badge" onclick="openDrawer()">📥 Inbox (<span id="inbox-count">0</span>)</button>
       <button id="torch-btn" class="pill-btn" onclick="toggleTorch()">✨ Flash</button>
       <button id="filter-btn" class="pill-btn" onclick="toggleFilter()">🌸 Color</button>
     </div>
@@ -101,11 +114,36 @@
     </div>
   </div>
 
-  <div id="toast">💖 Transferred to PC ✨</div>
+  <div id="toast">💖 Transferred! ✨</div>
 
   <div class="shutter-bar">
+    <!-- Send Any File (Video, Audio, Image, PDF) from Phone -->
+    <button class="action-circle-btn" onclick="document.getElementById('mobileFileInput').click()" title="Send Files/Videos/Music">
+      📁
+    </button>
+    <input type="file" id="mobileFileInput" multiple style="display:none" onchange="sendUniversalFiles(this)" />
+
+    <!-- Camera Snap -->
     <div class="shutter-ring" id="snap">
       <div class="shutter-core">🎀</div>
+    </div>
+
+    <!-- Inbox Quick View -->
+    <button class="action-circle-btn" onclick="openDrawer()" title="Received from PC">
+      📥
+    </button>
+  </div>
+
+  <!-- Laptop Inbox Drawer -->
+  <div class="drawer" id="inboxDrawer">
+    <div class="drawer-content">
+      <div class="drawer-header">
+        <h3 style="font-size: 16px; color: #4c0519;">📥 Files from Laptop</h3>
+        <button style="border:none; background:none; font-size: 20px;" onclick="closeDrawer()">✕</button>
+      </div>
+      <div id="inboxList">
+        <p style="color: #9d174d; text-align: center; font-size: 13px;">No files received from laptop yet.</p>
+      </div>
     </div>
   </div>
 
@@ -118,6 +156,7 @@
     let videoTrack = null;
     let isTorchOn = false;
     let isBwMode = false;
+    let receivedFiles = [];
 
     navigator.mediaDevices.getUserMedia({
       video: { facingMode: { ideal: "environment" }, width: { ideal: 1920 }, height: { ideal: 1080 } },
@@ -127,16 +166,16 @@
       videoTrack = stream.getVideoTracks()[0];
     }).catch(err => alert("Camera permission error: " + err));
 
+    // Camera Torch
     async function toggleTorch() {
       if (!videoTrack) return;
       try {
         const capabilities = videoTrack.getCapabilities ? videoTrack.getCapabilities() : {};
-        if (!capabilities.torch) return alert("Torch not supported on this phone 🌸");
+        if (!capabilities.torch) return alert("Torch not supported 🌸");
         isTorchOn = !isTorchOn;
         await videoTrack.applyConstraints({ advanced: [{ torch: isTorchOn }] });
-        const btn = document.getElementById('torch-btn');
-        btn.classList.toggle('active', isTorchOn);
-      } catch (e) { alert("Flashlight Error: " + e); }
+        document.getElementById('torch-btn').classList.toggle('active', isTorchOn);
+      } catch (e) { alert("Torch Error: " + e); }
     }
 
     function toggleFilter() {
@@ -146,6 +185,15 @@
       btn.classList.toggle('active', isBwMode);
     }
 
+    function triggerToast(txt) {
+      const toast = document.getElementById('toast');
+      toast.innerText = txt;
+      toast.style.display = 'block';
+      if (navigator.vibrate) navigator.vibrate(50);
+      setTimeout(() => { toast.style.display = 'none'; }, 1100);
+    }
+
+    // Snap Frame
     document.getElementById('snap').onclick = () => {
       if (!video.videoWidth) return;
       canvas.width = video.videoWidth;
@@ -166,12 +214,74 @@
 
       const base64Img = canvas.toDataURL('image/jpeg', 0.9).split(',')[1];
       socket.emit('send_frame', base64Img);
-
-      const toast = document.getElementById('toast');
-      toast.style.display = 'block';
-      if (navigator.vibrate) navigator.vibrate(50);
-      setTimeout(() => { toast.style.display = 'none'; }, 950);
+      triggerToast('💖 Sent to Laptop ✨');
     };
+
+    // Send Any File (Video, Music, PDF, Images) to Laptop
+    async function sendUniversalFiles(input) {
+      const files = Array.from(input.files);
+      if (!files.length) return;
+
+      for (const file of files) {
+        await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            socket.emit('send_file', {
+              name: file.name,
+              type: file.type || 'application/octet-stream',
+              size: file.size,
+              data: e.target.result
+            });
+            resolve();
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+      triggerToast(`📁 ${files.length} File(s) Sent to PC ✨`);
+      input.value = '';
+    }
+
+    // Receive Files from Laptop
+    socket.on('receive_file', (file) => {
+      receivedFiles.push(file);
+      document.getElementById('inbox-count').innerText = receivedFiles.length;
+      triggerToast(`📥 New file from Laptop! ✨`);
+      renderInbox();
+    });
+
+    function renderInbox() {
+      const container = document.getElementById('inboxList');
+      if (!receivedFiles.length) {
+        container.innerHTML = `<p style="color: #9d174d; text-align: center; font-size: 13px;">No files received from laptop yet.</p>`;
+        return;
+      }
+      container.innerHTML = '';
+      receivedFiles.forEach((f, idx) => {
+        const div = document.createElement('div');
+        div.className = 'inbox-item';
+        div.innerHTML = `
+          <div>
+            <div style="font-size: 13px; font-weight: 700; color: #4c0519; max-width: 190px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+              ${f.name}
+            </div>
+            <div style="font-size: 11px; color: #9d174d;">${f.type.split('/')[1] || 'File'}</div>
+          </div>
+          <button class="download-pill" onclick="downloadFile(${idx})">💾 Save</button>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function downloadFile(idx) {
+      const f = receivedFiles[idx];
+      const a = document.createElement('a');
+      a.href = f.data;
+      a.download = f.name;
+      a.click();
+    }
+
+    function openDrawer() { document.getElementById('inboxDrawer').style.display = 'flex'; }
+    function closeDrawer() { document.getElementById('inboxDrawer').style.display = 'none'; }
   </script>
 </body>
 </html>

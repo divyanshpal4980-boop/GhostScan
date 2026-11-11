@@ -5,22 +5,27 @@ const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
+
+// 1000MB (1 GB) Buffer Limit
 const io = new Server(server, {
-  cors: { origin: "*" },
-  maxHttpBufferSize: 1e8 // 100MB buffer for high-res images
+  maxHttpBufferSize: 1e9 // 1,000,000,000 bytes (~1000 MB)
 });
 
 app.use(express.static(path.join(__dirname, 'public')));
 
 io.on('connection', (socket) => {
-  console.log('Device connected:', socket.id);
-
-  // Phone se image aane par laptop browser ko forward karega
+  // Mobile Camera scanner frame
   socket.on('send_frame', (data) => {
-    io.emit('new_page', data);
+    socket.broadcast.emit('new_page', data);
+  });
+
+  // Universal Two-Way File Transfer (Phone <-> Laptop)
+  socket.on('send_file', (fileData) => {
+    socket.broadcast.emit('receive_file', fileData);
   });
 });
 
-server.listen(process.env.PORT || 3000, () => {
-  console.log('Server is running on port 3000');
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+  console.log(`GhostScan Server running on port ${PORT}`);
 });
