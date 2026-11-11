@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GhostScan — Workspace & Studio</title>
+  <title>GhostScan ✨ Pookie Edition</title>
   
-  <!-- CDNs -->
+  <!-- CDNs: jsPDF, JSZip, Cropper.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
@@ -13,25 +13,28 @@
   <script src="/socket.io/socket.io.js"></script>
 
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
+
     :root {
-      --primary: #2563eb;
-      --primary-hover: #1d4ed8;
-      --dark: #0f172a;
-      --surface: #ffffff;
-      --bg: #f8fafc;
-      --border: #e2e8f0;
-      --text: #0f172a;
-      --muted: #64748b;
-      --danger: #ef4444;
+      --pookie-pink: #f472b6;
+      --pookie-deep: #db2777;
+      --pookie-soft: #fdf2f8;
+      --pookie-card: #ffffff;
+      --pookie-lavender: #f3e8ff;
+      --pookie-border: #fbcfe8;
+      --text-main: #4c0519;
+      --text-muted: #9d174d;
+      --shadow-pookie: 0 10px 25px -4px rgba(244, 114, 182, 0.22);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+    body { background: #fff5f8; color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; }
 
-    /* Top Sticky Header */
+    /* Top Ribbon Header */
     header {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 2px solid var(--pookie-border);
       padding: 14px 32px;
       display: flex;
       justify-content: space-between;
@@ -39,127 +42,163 @@
       position: sticky;
       top: 0;
       z-index: 40;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+      box-shadow: 0 4px 15px rgba(251, 207, 232, 0.4);
     }
     .brand { display: flex; align-items: center; gap: 12px; }
-    .logo-box {
-      width: 36px; height: 36px; background: #0f172a; border-radius: 8px;
-      display: flex; align-items: center; justify-content: center; color: #38bdf8;
-      font-weight: 800; font-size: 18px;
+    .logo-badge {
+      width: 42px; height: 42px;
+      background: linear-gradient(135deg, #f472b6, #ec4899);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; box-shadow: 0 4px 10px rgba(236, 72, 153, 0.35);
+      animation: floatBadge 3s ease-in-out infinite;
     }
-    .brand h1 { font-size: 18px; font-weight: 700; color: var(--dark); }
+    @keyframes floatBadge {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
+    }
+    .brand h1 { font-size: 19px; font-weight: 800; color: var(--text-main); letter-spacing: -0.3px; }
     .badge-live {
       display: inline-flex; align-items: center; gap: 6px; font-size: 11px;
-      color: #15803d; background: #dcfce7; padding: 4px 10px; border-radius: 20px; font-weight: 600;
+      color: #9d174d; background: #fce7f3; border: 1px solid #fbcfe8;
+      padding: 4px 12px; border-radius: 20px; font-weight: 700;
     }
-    .live-dot { width: 6px; height: 6px; background: #16a34a; border-radius: 50%; }
+    .live-sparkle { font-size: 10px; }
 
     .header-actions { display: flex; align-items: center; gap: 10px; }
     .btn {
-      display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px;
-      font-size: 13px; font-weight: 600; border-radius: 8px; border: 1px solid transparent;
-      cursor: pointer; transition: 0.15s;
+      display: inline-flex; align-items: center; gap: 6px; padding: 10px 18px;
+      font-size: 13px; font-weight: 700; border-radius: 25px; border: none;
+      cursor: pointer; transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-    .btn-secondary { background: #fff; border-color: var(--border); color: #334155; }
-    .btn-secondary:hover { background: #f1f5f9; }
-    .btn-primary { background: var(--primary); color: #fff; }
-    .btn-primary:hover { background: var(--primary-hover); }
-    .btn-danger { background: #fee2e2; color: var(--danger); border-color: #fecaca; }
-    .btn-danger:hover { background: #fca5a5; }
+    .btn:hover { transform: translateY(-2px) scale(1.02); }
+    .btn:active { transform: scale(0.96); }
 
-    /* Content Area */
-    main { flex: 1; padding: 28px 32px; max-width: 1440px; margin: 0 auto; width: 100%; }
-    .subbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; }
-    .count-text { font-size: 14px; font-weight: 600; color: var(--muted); }
+    .btn-secondary {
+      background: #ffffff; border: 1.5px solid var(--pookie-border);
+      color: var(--text-main); box-shadow: 0 4px 10px rgba(244, 114, 182, 0.12);
+    }
+    .btn-secondary:hover { background: #fff0f5; }
+    .btn-primary {
+      background: linear-gradient(135deg, #f472b6, #ec4899);
+      color: #fff; box-shadow: 0 6px 16px rgba(236, 72, 153, 0.35);
+    }
+    .btn-primary:hover { box-shadow: 0 8px 20px rgba(236, 72, 153, 0.45); }
+    .btn-danger {
+      background: #ffe4e6; color: #be123c; border: 1.5px solid #fecdd3;
+    }
+    .btn-danger:hover { background: #fecdd3; }
 
-    /* Grid */
+    /* Main Grid Area */
+    main { flex: 1; padding: 30px 32px; max-width: 1440px; margin: 0 auto; width: 100%; }
+    .subbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .count-pill {
+      font-size: 13px; font-weight: 700; color: #be185d;
+      background: #fdf2f8; padding: 6px 14px; border-radius: 20px;
+      border: 1px solid #fbcfe8;
+    }
+
     #grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-      gap: 22px;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 24px;
     }
     .empty-state {
-      grid-column: 1 / -1; background: #fff; border: 2px dashed #cbd5e1;
-      border-radius: 12px; padding: 75px 20px; text-align: center; color: var(--muted);
+      grid-column: 1 / -1; background: #ffffff; border: 2px dashed #f9a8d4;
+      border-radius: 24px; padding: 80px 20px; text-align: center;
+      color: var(--text-muted); box-shadow: var(--shadow-pookie);
     }
-    .empty-state h3 { font-size: 18px; color: var(--text); margin-bottom: 6px; }
+    .empty-state h3 { font-size: 20px; color: var(--text-main); margin-bottom: 8px; }
+    .empty-icon { font-size: 42px; margin-bottom: 12px; }
 
-    /* Document Card */
+    /* Cute Document Card */
     .doc-card {
-      background: var(--surface); border-radius: 10px; border: 1px solid var(--border);
-      overflow: hidden; display: flex; flex-direction: column; transition: transform 0.15s, box-shadow 0.15s;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+      background: #ffffff; border-radius: 20px; border: 2px solid var(--pookie-border);
+      overflow: hidden; display: flex; flex-direction: column;
+      box-shadow: 0 8px 18px rgba(244, 114, 182, 0.15);
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-    .doc-card:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.06); }
+    .doc-card:hover { transform: translateY(-4px) scale(1.02); box-shadow: var(--shadow-pookie); }
 
     .thumb-area {
-      height: 250px; background: #0f172a; display: flex;
+      height: 260px; background: #fff0f5; display: flex;
       justify-content: center; align-items: center; position: relative; cursor: pointer;
     }
-    .thumb-area img { max-width: 90%; max-height: 90%; object-fit: contain; }
+    .thumb-area img { max-width: 90%; max-height: 90%; object-fit: contain; border-radius: 8px; }
     .view-overlay-btn {
-      position: absolute; inset: 0; background: rgba(15, 23, 42, 0.5);
+      position: absolute; inset: 0; background: rgba(251, 113, 133, 0.25);
       display: flex; justify-content: center; align-items: center;
-      color: #fff; font-size: 13px; font-weight: 600; opacity: 0; transition: 0.15s;
-      backdrop-filter: blur(2px);
+      color: #881337; font-size: 14px; font-weight: 800; opacity: 0; transition: 0.2s;
+      backdrop-filter: blur(3px);
     }
     .thumb-area:hover .view-overlay-btn { opacity: 1; }
 
     .card-footer {
-      padding: 10px 12px; background: #fff; border-top: 1px solid var(--border);
+      padding: 12px 16px; background: #ffffff; border-top: 1.5px solid var(--pookie-border);
       display: flex; justify-content: space-between; align-items: center;
     }
-    .page-index { font-size: 12px; font-weight: 700; color: var(--muted); }
-    .action-icons { display: flex; gap: 4px; }
-    .icon-btn {
-      background: none; border: 1px solid transparent; padding: 6px 7px;
-      font-size: 13px; border-radius: 6px; cursor: pointer; color: #475569;
+    .page-index {
+      font-size: 12px; font-weight: 800; color: #be185d;
+      background: #fce7f3; padding: 4px 10px; border-radius: 12px;
     }
-    .icon-btn:hover { background: #f1f5f9; border-color: var(--border); }
-    .icon-btn.delete:hover { background: #fee2e2; color: var(--danger); border-color: #fecaca; }
+    .action-icons { display: flex; gap: 6px; }
+    .icon-btn {
+      background: #fff5f8; border: 1px solid #fbcfe8; padding: 7px 9px;
+      font-size: 14px; border-radius: 10px; cursor: pointer; transition: 0.15s;
+    }
+    .icon-btn:hover { background: #fce7f3; transform: scale(1.1); }
+    .icon-btn.delete:hover { background: #ffe4e6; border-color: #fca5a5; }
 
     /* Modals */
     .modal-overlay {
-      position: fixed; inset: 0; background: rgba(15, 23, 42, 0.85);
-      backdrop-filter: blur(5px); display: none; justify-content: center;
+      position: fixed; inset: 0; background: rgba(76, 5, 25, 0.55);
+      backdrop-filter: blur(8px); display: none; justify-content: center;
       align-items: center; z-index: 100; padding: 20px;
     }
     .modal-box {
-      background: #fff; width: 100%; max-width: 960px; max-height: 92vh;
-      border-radius: 12px; overflow: hidden; display: flex; flex-direction: column;
-      box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+      background: #ffffff; width: 100%; max-width: 960px; max-height: 92vh;
+      border-radius: 28px; border: 2px solid var(--pookie-border);
+      overflow: hidden; display: flex; flex-direction: column;
+      box-shadow: 0 25px 50px rgba(190, 24, 93, 0.3);
     }
     .modal-header {
-      padding: 14px 20px; border-bottom: 1px solid var(--border);
-      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px 24px; border-bottom: 1.5px solid var(--pookie-border);
+      display: flex; justify-content: space-between; align-items: center; background: #fff7fa;
     }
-    .modal-header h3 { font-size: 16px; font-weight: 700; }
+    .modal-header h3 { font-size: 17px; font-weight: 800; color: var(--text-main); }
     .modal-close {
-      background: none; border: none; font-size: 18px; cursor: pointer; color: var(--muted);
+      background: #fff; border: 1.5px solid var(--pookie-border);
+      width: 32px; height: 32px; border-radius: 50%; font-size: 14px;
+      cursor: pointer; color: var(--text-muted); font-weight: 700;
+      transition: 0.15s;
     }
+    .modal-close:hover { background: #fce7f3; transform: rotate(90deg); }
 
     /* Full View Body */
     .view-body {
-      background: #090d16; flex: 1; height: 70vh; display: flex;
-      justify-content: center; align-items: center; overflow: hidden; padding: 12px;
+      background: #200814; flex: 1; height: 68vh; display: flex;
+      justify-content: center; align-items: center; overflow: hidden; padding: 16px;
     }
-    .view-body img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .view-body img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px; }
 
-    /* Crop & Edit Studio Body */
+    /* Crop Studio Body */
     .edit-body { display: flex; flex-direction: column; height: 75vh; }
-    .crop-viewport { flex: 1; background: #090d16; position: relative; overflow: hidden; }
+    .crop-viewport { flex: 1; background: #1c0512; position: relative; overflow: hidden; }
     .crop-viewport img { max-width: 100%; }
     
     .edit-toolbar {
-      padding: 12px 20px; background: #f8fafc; border-top: 1px solid var(--border);
+      padding: 14px 24px; background: #fff5f8; border-top: 1.5px solid var(--pookie-border);
       display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between;
     }
-    .slider-group { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: #475569; }
-    .slider-group input[type="range"] { width: 95px; }
+    .slider-group {
+      display: flex; align-items: center; gap: 8px; font-size: 12px;
+      font-weight: 700; color: var(--text-muted);
+    }
+    .slider-group input[type="range"] { accent-color: #ec4899; width: 95px; }
 
     .modal-footer {
-      padding: 12px 20px; border-top: 1px solid var(--border);
-      display: flex; justify-content: flex-end; gap: 10px; background: #fff;
+      padding: 14px 24px; border-top: 1.5px solid var(--pookie-border);
+      display: flex; justify-content: flex-end; gap: 10px; background: #ffffff;
     }
   </style>
 </head>
@@ -167,22 +206,22 @@
 
   <header>
     <div class="brand">
-      <div class="logo-box">G</div>
+      <div class="logo-badge">🎀</div>
       <div>
-        <h1>GhostScan Studio</h1>
+        <h1>GhostScan Studio ✨</h1>
       </div>
-      <div class="badge-live"><span class="live-dot"></span> Live Terminal</div>
+      <div class="badge-live"><span class="live-sparkle">💖</span> Ready & Synced</div>
     </div>
     <div class="header-actions">
-      <button class="btn btn-danger" onclick="clearAll()">Reset All</button>
+      <button class="btn btn-danger" onclick="clearAll()">🧹 Clear All</button>
       <button class="btn btn-secondary" onclick="exportZipJPEGs()">📦 Export All (ZIP JPEG)</button>
-      <button class="btn btn-primary" onclick="exportPDF()">📄 Export Final PDF</button>
+      <button class="btn btn-primary" onclick="exportPDF()">🌸 Export Final PDF</button>
     </div>
   </header>
 
   <main>
     <div class="subbar">
-      <span class="count-text" id="status-counter">Ready for scans...</span>
+      <span class="count-pill" id="status-counter">✨ Waiting for cute scans...</span>
     </div>
     <div id="grid"></div>
   </main>
@@ -191,7 +230,7 @@
   <div class="modal-overlay" id="viewModal">
     <div class="modal-box" style="max-width: 860px;">
       <div class="modal-header">
-        <h3 id="viewTitle">Document Preview</h3>
+        <h3 id="viewTitle">Document Preview 👁️✨</h3>
         <button class="modal-close" onclick="closeViewModal()">✕</button>
       </div>
       <div class="view-body">
@@ -200,7 +239,7 @@
       <div class="modal-footer">
         <button class="btn btn-secondary" onclick="closeViewModal()">Close</button>
         <button class="btn btn-secondary" id="viewDownloadBtn">💾 Download JPEG</button>
-        <button class="btn btn-primary" id="viewEditBtn">✂️ Crop & Edit</button>
+        <button class="btn btn-primary" id="viewEditBtn">✂️ Crop & Adjust</button>
       </div>
     </div>
   </div>
@@ -209,7 +248,7 @@
   <div class="modal-overlay" id="editModal">
     <div class="modal-box">
       <div class="modal-header">
-        <h3>Crop & Adjust Studio</h3>
+        <h3>Crop & Adjust Studio 🎀</h3>
         <button class="modal-close" onclick="closeEditModal()">✕</button>
       </div>
       <div class="edit-body">
@@ -217,28 +256,28 @@
           <img id="cropperTargetImg" src="" />
         </div>
         <div class="edit-toolbar">
-          <div style="display:flex; gap: 6px;">
+          <div style="display:flex; gap: 8px;">
             <button class="btn btn-secondary" onclick="cropper.rotate(-90)" title="Rotate Left">↺ 90°</button>
             <button class="btn btn-secondary" onclick="cropper.rotate(90)" title="Rotate Right">↻ 90°</button>
             <button class="btn btn-secondary" onclick="cropper.reset()">Reset Crop</button>
           </div>
           <div class="slider-group">
-            <label>Brightness</label>
+            <label>Brightness ✨</label>
             <input type="range" id="brightnessInput" min="60" max="150" value="100" oninput="updateFilters()">
           </div>
           <div class="slider-group">
-            <label>Contrast</label>
+            <label>Contrast 🎨</label>
             <input type="range" id="contrastInput" min="60" max="180" value="100" oninput="updateFilters()">
           </div>
           <div class="slider-group">
             <input type="checkbox" id="bwCheck" onchange="updateFilters()">
-            <label for="bwCheck">Force B&W</label>
+            <label for="bwCheck">Pure B&W 🖤</label>
           </div>
         </div>
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
-        <button class="btn btn-primary" onclick="saveEditedImage()">Save Changes</button>
+        <button class="btn btn-primary" onclick="saveEditedImage()">💖 Save Changes</button>
       </div>
     </div>
   </div>
@@ -246,7 +285,7 @@
   <script>
     const socket = io();
     const { jsPDF } = window.jspdf;
-    let pages = []; // { id, base64 }
+    let pages = [];
     let cropper = null;
     let activeIndex = null;
 
@@ -261,17 +300,18 @@
       grid.innerHTML = '';
 
       if (pages.length === 0) {
-        counter.innerText = '0 Documents in Workspace';
+        counter.innerText = '🌸 0 Pages in Workspace';
         grid.innerHTML = `
           <div class="empty-state">
-            <h3>Camera is Connected</h3>
-            <p style="margin-top:6px;">Snap pages from phone to preview, edit, crop, and export here in real time.</p>
+            <div class="empty-icon">🎀 📸</div>
+            <h3>Waiting for Scans!</h3>
+            <p style="margin-top:6px;">Snap documents from your phone camera to preview, crop & export in style ✨</p>
           </div>
         `;
         return;
       }
 
-      counter.innerText = `Total Documents: ${pages.length} Pages`;
+      counter.innerText = `🎀 Total Pages: ${pages.length} Captured`;
 
       pages.forEach((p, idx) => {
         const card = document.createElement('div');
@@ -279,10 +319,10 @@
         card.innerHTML = `
           <div class="thumb-area" onclick="openViewModal(${idx})">
             <img src="data:image/jpeg;base64,${p.base64}" />
-            <div class="view-overlay-btn">👁️ Click to View</div>
+            <div class="view-overlay-btn">👁️ Click to View ✨</div>
           </div>
           <div class="card-footer">
-            <span class="page-index">#${idx + 1}</span>
+            <span class="page-index">🌸 #${idx + 1}</span>
             <div class="action-icons">
               <button class="icon-btn" title="View Full" onclick="openViewModal(${idx})">👁️</button>
               <button class="icon-btn" title="Crop & Edit" onclick="openEditModal(${idx})">✂️</button>
@@ -298,7 +338,7 @@
     /* FULL VIEW */
     function openViewModal(index) {
       activeIndex = index;
-      document.getElementById('viewTitle').innerText = `Document Page ${index + 1} of ${pages.length}`;
+      document.getElementById('viewTitle').innerText = `Document #${index + 1} of ${pages.length} 👁️`;
       const img = document.getElementById('fullViewImg');
       img.src = 'data:image/jpeg;base64,' + pages[index].base64;
 
@@ -330,7 +370,7 @@
       if (cropper) cropper.destroy();
       cropper = new Cropper(targetImg, {
         viewMode: 1,
-        autoCropArea: 0.96,
+        autoCropArea: 0.95,
         responsive: true,
         background: false
       });
@@ -378,7 +418,7 @@
 
     /* DELETIONS */
     function deletePage(index) {
-      if (confirm(`Delete Page #${index + 1}?`)) {
+      if (confirm(`Delete Page #${index + 1}? 🗑️`)) {
         pages.splice(index, 1);
         render();
       }
@@ -386,7 +426,7 @@
 
     function clearAll() {
       if (pages.length === 0) return;
-      if (confirm('Clear all pages from workspace?')) {
+      if (confirm('Clear all pages from workspace? 🎀')) {
         pages = [];
         render();
       }
@@ -401,7 +441,7 @@
     }
 
     async function exportZipJPEGs() {
-      if (pages.length === 0) return alert('No pages to export!');
+      if (pages.length === 0) return alert('No pages to export! 🌸');
       const zip = new JSZip();
       pages.forEach((p, idx) => {
         zip.file(`GhostScan_Page_${idx + 1}.jpg`, p.base64, { base64: true });
@@ -409,12 +449,12 @@
       const blob = await zip.generateAsync({ type: 'blob' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
-      link.download = `GhostScan_Images_${Date.now()}.zip`;
+      link.download = `GhostScan_JPEGs_${Date.now()}.zip`;
       link.click();
     }
 
     function exportPDF() {
-      if (pages.length === 0) return alert('No pages to export!');
+      if (pages.length === 0) return alert('No pages to export! 🌸');
       const pdf = new jsPDF('p', 'mm', 'a4');
       pages.forEach((p, idx) => {
         if (idx > 0) pdf.addPage();
