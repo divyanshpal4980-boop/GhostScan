@@ -26,33 +26,49 @@
     body { background: #fff5f8; color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; }
 
     header {
-      background: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.92);
       backdrop-filter: blur(12px);
       border-bottom: 2px solid var(--pookie-border);
-      padding: 12px 28px;
+      padding: 12px 24px;
       display: flex; justify-content: space-between; align-items: center;
-      position: sticky; top: 0; z-index: 40;
+      position: sticky; top: 0; z-index: 40; flex-wrap: wrap; gap: 10px;
     }
-    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     .logo-badge {
-      width: 42px; height: 42px; background: linear-gradient(135deg, #f472b6, #ec4899);
+      width: 40px; height: 40px; background: linear-gradient(135deg, #f472b6, #ec4899);
       border-radius: 14px; display: flex; align-items: center; justify-content: center;
-      font-size: 22px; box-shadow: 0 4px 10px rgba(236, 72, 153, 0.3);
+      font-size: 20px; box-shadow: 0 4px 10px rgba(236, 72, 153, 0.3);
     }
     .brand h1 { font-size: 18px; font-weight: 800; color: var(--text-main); }
     
-    /* Pairing Badge */
-    .pair-pill {
+    /* Dual PIN Header Strip */
+    .pin-strip {
       display: inline-flex; align-items: center; gap: 8px;
-      background: #fdf2f8; border: 2px dashed #f472b6; padding: 5px 14px;
-      border-radius: 20px; font-size: 13px; font-weight: 800; color: #be185d;
-      cursor: pointer;
+      background: #fdf2f8; border: 2px solid #f472b6; padding: 4px 12px;
+      border-radius: 22px; font-size: 12px; font-weight: 800; color: #be185d;
     }
-    .pair-pill span { background: #be185d; color: #fff; padding: 2px 8px; border-radius: 8px; letter-spacing: 1px; }
+    .my-pin-tag {
+      background: #be185d; color: #fff; padding: 3px 9px; border-radius: 10px;
+      font-size: 14px; letter-spacing: 1.5px;
+    }
+    .mini-pin-input {
+      width: 78px; padding: 4px 8px; border-radius: 10px; border: 1.5px solid #f472b6;
+      font-size: 13px; font-weight: 800; text-align: center; letter-spacing: 2px;
+      outline: none; color: #4c0519;
+    }
+    .mini-connect-btn {
+      background: #ec4899; color: #fff; border: none; padding: 5px 11px;
+      border-radius: 12px; font-size: 11px; font-weight: 800; cursor: pointer;
+    }
+    .mini-connect-btn:hover { background: #db2777; }
+    .paired-badge {
+      background: #dcfce7; color: #15803d; border: 1.5px solid #86efac;
+      padding: 4px 10px; border-radius: 14px; font-size: 12px; font-weight: 800;
+    }
 
     .header-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .btn {
-      display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px;
+      display: inline-flex; align-items: center; gap: 6px; padding: 9px 15px;
       font-size: 13px; font-weight: 700; border-radius: 25px; border: none;
       cursor: pointer; transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
@@ -63,7 +79,7 @@
     .btn-danger { background: #ffe4e6; color: #be123c; border: 1.5px solid #fecdd3; }
 
     main { flex: 1; padding: 24px 28px; max-width: 1440px; margin: 0 auto; width: 100%; }
-    .subbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .subbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
     .count-pill { font-size: 13px; font-weight: 700; color: #be185d; background: #fdf2f8; padding: 6px 14px; border-radius: 20px; border: 1px solid #fbcfe8; }
 
     #grid {
@@ -73,13 +89,26 @@
     }
     .empty-state {
       grid-column: 1 / -1; background: #ffffff; border: 2px dashed #f9a8d4;
-      border-radius: 24px; padding: 60px 20px; text-align: center; color: var(--text-muted);
+      border-radius: 24px; padding: 48px 20px; text-align: center; color: var(--text-muted);
+      max-width: 540px; margin: 20px auto; width: 100%;
+      box-shadow: 0 12px 30px rgba(244, 114, 182, 0.14);
     }
-    .qr-banner {
-      margin-top: 15px; display: inline-flex; flex-direction: column; align-items: center;
-      background: #fff5f8; border: 1.5px solid #fbcfe8; padding: 12px; border-radius: 16px;
+    .big-pin-box {
+      background: #fff0f6; border: 2px solid #f472b6; border-radius: 18px;
+      padding: 16px; margin: 16px 0;
     }
-    .qr-banner img { width: 130px; height: 130px; border-radius: 8px; }
+    .big-pin-number {
+      font-size: 36px; font-weight: 800; letter-spacing: 8px; color: #be185d; margin-top: 4px;
+    }
+    .card-pin-input {
+      width: 180px; font-size: 24px; font-weight: 800; text-align: center;
+      letter-spacing: 6px; padding: 10px; border-radius: 14px; border: 2px solid #f472b6;
+      outline: none; color: #4c0519; margin-right: 8px;
+    }
+    .status-msg {
+      margin-top: 14px; font-size: 13px; font-weight: 700; color: #be185d;
+      background: #fdf2f8; padding: 8px 14px; border-radius: 12px; display: inline-block;
+    }
 
     .doc-card {
       background: #ffffff; border-radius: 18px; border: 2px solid var(--pookie-border);
@@ -88,7 +117,7 @@
     }
     .preview-box {
       height: 220px; background: #fff0f5; display: flex;
-      justify-content: center; align-items: center; position: relative; overflow: hidden;
+      justify-content: center; align-items: center; position: relative; overflow: hidden; cursor: pointer;
     }
     .preview-box img { max-width: 90%; max-height: 90%; object-fit: contain; }
     .preview-box video { width: 100%; height: 100%; object-fit: cover; }
@@ -135,18 +164,21 @@
   <header>
     <div class="brand">
       <div class="logo-badge">🎀</div>
-      <div>
-        <h1>Divyansh Studio ✨</h1>
+      <h1>Divyansh Studio ✨</h1>
+
+      <!-- Always-visible Dual PIN Controls -->
+      <div class="pin-strip">
+        <span>Laptop PIN:</span>
+        <span class="my-pin-tag" id="headerMyPin">----</span>
+        <span>|</span>
+        <input type="number" id="headerPhonePinInput" class="mini-pin-input" placeholder="Phone PIN" />
+        <button class="mini-connect-btn" onclick="connectFromHeader()">Connect 💖</button>
       </div>
-      <!-- Pair PIN Display -->
-      <div class="pair-pill" onclick="changePin()" title="Click to set custom PIN">
-        Pair PIN: <span id="pinDisplay">----</span> 🔄
-      </div>
+      <span id="pairedIndicator" style="display:none;" class="paired-badge">💖 Connected</span>
     </div>
+
     <div class="header-actions">
-      <button class="btn btn-send" onclick="document.getElementById('pcFileInput').click()">
-        📤 Send to Phone
-      </button>
+      <button class="btn btn-send" onclick="triggerPcSend()">📤 Send to Phone</button>
       <input type="file" id="pcFileInput" multiple style="display:none;" onchange="sendFilesToPhone(this)" />
 
       <button class="btn btn-danger" onclick="clearAll()">🧹 Clear All</button>
@@ -157,7 +189,7 @@
 
   <main>
     <div class="subbar">
-      <span class="count-pill" id="status-counter">✨ Paired and ready...</span>
+      <span class="count-pill" id="status-counter">✨ Waiting for Dual-PIN Pairing...</span>
     </div>
     <div id="grid"></div>
   </main>
@@ -203,26 +235,69 @@
     let cropper = null;
     let activeCropIndex = null;
 
-    // PIN Setup (Remembered in localStorage or randomly generated)
-    let myPin = localStorage.getItem('ghost_pc_pin') || Math.floor(1000 + Math.random() * 9000).toString();
-    localStorage.setItem('ghost_pc_pin', myPin);
-    document.getElementById('pinDisplay').innerText = myPin;
+    let myLaptopPin = '----';
+    let connectedPhonePin = null;
+    let pairStatusText = 'Dono devices par ek-dusre ka PIN fill karein ✨';
 
-    // Join private room on connect
-    socket.emit('join_room', myPin);
+    // Server assigns a fresh random PIN on every page load
+    socket.on('assigned_pin', (pin) => {
+      myLaptopPin = pin;
+      connectedPhonePin = null;
+      document.getElementById('headerMyPin').innerText = pin;
+      document.getElementById('pairedIndicator').style.display = 'none';
+      render();
+    });
 
-    function changePin() {
-      const newPin = prompt("Enter a 4-digit PIN for this Laptop:", myPin);
-      if (newPin && newPin.trim()) {
-        myPin = newPin.trim();
-        localStorage.setItem('ghost_pc_pin', myPin);
-        document.getElementById('pinDisplay').innerText = myPin;
-        socket.emit('join_room', myPin);
-        render();
-      }
+    function requestPair(phonePinVal) {
+      const cleanPin = String(phonePinVal || '').trim();
+      if (!cleanPin) return alert('Pehle Phone ka 4-digit PIN daalein! 📱');
+      document.getElementById('headerPhonePinInput').value = cleanPin;
+      const cardInput = document.getElementById('cardPhonePinInput');
+      if (cardInput) cardInput.value = cleanPin;
+      socket.emit('pair_request', cleanPin);
     }
 
-    // 1. Scans received only from paired phone
+    function connectFromHeader() {
+      requestPair(document.getElementById('headerPhonePinInput').value);
+    }
+
+    function connectFromCard() {
+      const cardInput = document.getElementById('cardPhonePinInput');
+      if (cardInput) requestPair(cardInput.value);
+    }
+
+    socket.on('pair_status', (data) => {
+      pairStatusText = data.msg;
+      document.getElementById('status-counter').innerText = data.msg;
+      const statusEl = document.getElementById('cardStatusMsg');
+      if (statusEl) statusEl.innerText = data.msg;
+    });
+
+    socket.on('incoming_pair_hint', ({ fromPin }) => {
+      pairStatusText = `🔔 Phone (${fromPin}) connect hona chahta hai! Neeche ${fromPin} daal kar Connect dabayein.`;
+      document.getElementById('status-counter').innerText = pairStatusText;
+      const statusEl = document.getElementById('cardStatusMsg');
+      if (statusEl) statusEl.innerText = pairStatusText;
+    });
+
+    socket.on('paired_success', ({ partnerPin }) => {
+      connectedPhonePin = partnerPin;
+      pairStatusText = `💖 Paired! Laptop (${myLaptopPin}) ↔ Phone (${partnerPin})`;
+      const badge = document.getElementById('pairedIndicator');
+      badge.innerText = `💖 Paired with ${partnerPin}`;
+      badge.style.display = 'inline-block';
+      render();
+    });
+
+    socket.on('partner_disconnected', () => {
+      connectedPhonePin = null;
+      pairStatusText = '⚠️ Phone refresh/disconnect ho gaya. Naya Phone PIN daalein!';
+      document.getElementById('pairedIndicator').style.display = 'none';
+      document.getElementById('headerPhonePinInput').value = '';
+      render();
+    });
+
+    // 1. Scans received ONLY from paired phone
     socket.on('new_page', (base64Img) => {
       items.push({
         id: Date.now() + Math.random(),
@@ -234,7 +309,7 @@
       render();
     });
 
-    // 2. Files received only from paired phone
+    // 2. Files received ONLY from paired phone
     socket.on('receive_file', (file) => {
       items.push({
         id: Date.now() + Math.random(),
@@ -246,7 +321,13 @@
       render();
     });
 
-    // 3. Send to Phone inside this private PIN room
+    function triggerPcSend() {
+      if (!connectedPhonePin) {
+        return alert('Pehle Phone aur Laptop ko ek-dusre ke PIN se connect karein! 🎀');
+      }
+      document.getElementById('pcFileInput').click();
+    }
+
     async function sendFilesToPhone(input) {
       const files = Array.from(input.files);
       if (!files.length) return;
@@ -266,7 +347,7 @@
           reader.readAsDataURL(file);
         });
       }
-      alert(`📤 ${files.length} file(s) sent to Phone (PIN: ${myPin})!`);
+      alert(`📤 ${files.length} file(s) sent to Phone (${connectedPhonePin})! ✨`);
       input.value = '';
     }
 
@@ -276,23 +357,36 @@
       grid.innerHTML = '';
 
       if (items.length === 0) {
-        counter.innerText = `🌸 Private Room PIN: ${myPin}`;
-        const autoUrl = `${window.location.origin}/mobile.html?pin=${myPin}`;
+        counter.innerText = connectedPhonePin
+          ? `💖 Connected: Laptop (${myLaptopPin}) ↔ Phone (${connectedPhonePin})`
+          : pairStatusText;
+
+        const savedInput = document.getElementById('headerPhonePinInput').value || '';
         grid.innerHTML = `
           <div class="empty-state">
-            <div style="font-size: 38px; margin-bottom: 8px;">🎀 📱 💻</div>
-            <h3 style="color:#4c0519;">Ready for Phone Connection</h3>
-            <p style="margin-top:4px;">Enter PIN <b>${myPin}</b> on your phone, or scan the QR below:</p>
-            <div class="qr-banner">
-              <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(autoUrl)}" alt="Scan QR" />
-              <div style="font-size:11px; font-weight:700; margin-top:6px; color:#be185d;">Scan with phone camera</div>
+            <div style="font-size: 38px; margin-bottom: 6px;">🎀 💻 ↔ 📱</div>
+            <h3 style="color:#4c0519; font-size: 20px;">Dual-PIN Private Pairing</h3>
+
+            <div class="big-pin-box">
+              <div style="font-size: 12px; font-weight: 700; color: #9d174d;">1. Ye Laptop PIN apne Phone me daalein:</div>
+              <div class="big-pin-number">${myLaptopPin}</div>
             </div>
+
+            <div style="margin-top: 14px;">
+              <div style="font-size: 12px; font-weight: 700; color: #9d174d; margin-bottom: 8px;">2. Phone screen par dikh raha PIN yahan daalein:</div>
+              <input type="number" id="cardPhonePinInput" class="card-pin-input" placeholder="0000" value="${savedInput}" />
+              <button class="btn btn-primary" style="padding: 13px 22px; font-size: 15px;" onclick="connectFromCard()">Connect 💖</button>
+            </div>
+
+            <div class="status-msg" id="cardStatusMsg">${pairStatusText}</div>
           </div>
         `;
         return;
       }
 
-      counter.innerText = `🎀 Items: ${items.length} (Room PIN: ${myPin})`;
+      counter.innerText = connectedPhonePin
+        ? `🎀 Items: ${items.length} | Connected: Laptop (${myLaptopPin}) ↔ Phone (${connectedPhonePin})`
+        : `🎀 Items: ${items.length} | ⚠️ Not Connected (Enter Phone PIN above)`;
 
       items.forEach((item, idx) => {
         const card = document.createElement('div');
@@ -390,12 +484,12 @@
       if (!images.length) return alert('No images to export!');
       const zip = new JSZip();
       images.forEach((img, idx) => {
-        zip.file(`GhostScan_${idx + 1}.jpg`, img.dataUri.split(',')[1], { base64: true });
+        zip.file(`DivyanshScan_${idx + 1}.jpg`, img.dataUri.split(',')[1], { base64: true });
       });
       const blob = await zip.generateAsync({ type: 'blob' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
-      link.download = `GhostScan_Images_${Date.now()}.zip`;
+      link.download = `DivyanshScan_Images_${Date.now()}.zip`;
       link.click();
     }
 
@@ -407,7 +501,7 @@
         if (idx > 0) pdf.addPage();
         pdf.addImage(img.dataUri, 'JPEG', 10, 10, 190, 277);
       });
-      pdf.save(`GhostScan_Doc_${Date.now()}.pdf`);
+      pdf.save(`DivyanshScan_Doc_${Date.now()}.pdf`);
     }
 
     render();

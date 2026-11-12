@@ -16,19 +16,20 @@
     .top-bar {
       position: absolute; top: 0; left: 0; right: 0; height: 68px;
       display: flex; justify-content: space-between; align-items: center;
-      padding: 0 14px; z-index: 20; background: linear-gradient(180deg, rgba(24, 4, 15, 0.95), transparent);
+      padding: 0 12px; z-index: 20; background: linear-gradient(180deg, rgba(24, 4, 15, 0.95), transparent);
     }
     .badge-live {
-      display: inline-flex; align-items: center; gap: 5px; font-size: 11px;
-      font-weight: 800; color: #fbcfe8; background: rgba(244, 114, 182, 0.2); border: 1.5px solid #f472b6;
-      padding: 6px 10px; border-radius: 20px; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 5px; font-size: 10px;
+      font-weight: 800; color: #fbcfe8; background: rgba(244, 114, 182, 0.22); border: 1.5px solid #f472b6;
+      padding: 5px 9px; border-radius: 20px; cursor: pointer;
     }
     .dot { width: 7px; height: 7px; background: #f472b6; border-radius: 50%; }
+    .dot.connected { background: #4ade80; box-shadow: 0 0 8px #4ade80; }
 
-    .control-pills { display: flex; gap: 5px; }
+    .control-pills { display: flex; gap: 4px; }
     .pill-btn {
       background: rgba(255,255,255,0.14); border: 1.5px solid rgba(255,255,255,0.25);
-      color: #fff; padding: 6px 10px; border-radius: 20px; font-size: 11px; font-weight: 700;
+      color: #fff; padding: 6px 9px; border-radius: 20px; font-size: 11px; font-weight: 700;
       cursor: pointer; backdrop-filter: blur(8px); transition: 0.15s;
     }
     .pill-btn:active { transform: scale(0.92); }
@@ -61,10 +62,7 @@
       padding-bottom: 12px; z-index: 20;
     }
 
-    /* Mode Selector (Photo vs Video) */
-    .mode-selector {
-      display: flex; gap: 18px; margin: 8px 0 12px;
-    }
+    .mode-selector { display: flex; gap: 18px; margin: 8px 0 12px; }
     .mode-tab {
       font-size: 12px; font-weight: 800; color: rgba(255,255,255,0.5); letter-spacing: 1px;
       cursor: pointer; transition: 0.2s; padding: 3px 10px; border-radius: 12px;
@@ -73,7 +71,6 @@
       color: #fbcfe8; background: rgba(244, 114, 182, 0.25); text-shadow: 0 0 8px rgba(244,114,182,0.8);
     }
 
-    /* Shutter Bar */
     .shutter-bar {
       width: 100%; display: flex; justify-content: space-evenly; align-items: center; padding: 0 16px;
     }
@@ -91,9 +88,7 @@
       transition: all 0.2s;
     }
     .shutter-ring:active { transform: scale(0.92); }
-    .shutter-ring.recording {
-      border-color: #ef4444; box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
-    }
+    .shutter-ring.recording { border-color: #ef4444; box-shadow: 0 0 20px rgba(239, 68, 68, 0.6); }
 
     .shutter-core {
       width: 62px; height: 62px; border-radius: 50%;
@@ -101,14 +96,9 @@
       display: flex; justify-content: center; align-items: center; font-size: 20px; color: #fff;
       transition: all 0.2s;
     }
-    .shutter-core.video-mode {
-      background: linear-gradient(135deg, #ef4444, #b91c1c);
-    }
-    .shutter-core.recording {
-      width: 32px; height: 32px; border-radius: 8px; background: #ef4444; font-size: 0;
-    }
+    .shutter-core.video-mode { background: linear-gradient(135deg, #ef4444, #b91c1c); }
+    .shutter-core.recording { width: 32px; height: 32px; border-radius: 8px; background: #ef4444; font-size: 0; }
 
-    /* Toast */
     #toast {
       position: absolute; bottom: 160px; left: 50%; transform: translateX(-50%);
       background: #ffffff; border: 2px solid #f472b6; color: #be185d;
@@ -134,21 +124,33 @@
       border-radius: 20px; font-size: 12px; font-weight: 700; cursor: pointer;
     }
 
-    /* PIN Modal */
+    /* Dual-PIN Pairing Modal */
     .pin-modal {
-      position: fixed; inset: 0; background: rgba(24, 4, 15, 0.95);
-      z-index: 150; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 24px;
+      position: fixed; inset: 0; background: rgba(24, 4, 15, 0.94); backdrop-filter: blur(8px);
+      z-index: 150; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px;
     }
     .pin-box {
-      background: #fff; padding: 28px 24px; border-radius: 24px; width: 100%; max-width: 320px; text-align: center;
+      background: #fff; padding: 24px 20px; border-radius: 26px; width: 100%; max-width: 340px; text-align: center;
+      border: 2.5px solid #f472b6; box-shadow: 0 15px 35px rgba(244, 114, 182, 0.35);
+    }
+    .my-phone-pin-card {
+      background: #fff0f6; border: 2px dashed #f472b6; border-radius: 16px;
+      padding: 12px; margin: 12px 0;
+    }
+    .my-phone-pin-val {
+      font-size: 32px; font-weight: 800; letter-spacing: 6px; color: #be185d; margin-top: 2px;
     }
     .pin-input {
       width: 100%; font-size: 26px; font-weight: 800; text-align: center; letter-spacing: 6px;
-      padding: 10px; border-radius: 14px; border: 2px solid #f472b6; margin: 16px 0; outline: none;
+      padding: 10px; border-radius: 14px; border: 2px solid #f472b6; margin: 10px 0 14px; outline: none; color: #4c0519;
     }
     .pin-btn {
-      width: 100%; background: #ec4899; color: #fff; font-size: 15px; font-weight: 800;
-      padding: 12px; border: none; border-radius: 18px; cursor: pointer;
+      width: 100%; background: linear-gradient(135deg, #f472b6, #ec4899); color: #fff; font-size: 15px; font-weight: 800;
+      padding: 13px; border: none; border-radius: 18px; cursor: pointer;
+    }
+    .mobile-pair-status {
+      margin-top: 12px; font-size: 12px; font-weight: 700; color: #9d174d;
+      background: #fdf2f8; padding: 8px 10px; border-radius: 12px;
     }
     canvas { display: none; }
   </style>
@@ -157,7 +159,8 @@
 
   <div class="top-bar">
     <div class="badge-live" onclick="showPinModal()">
-      <span class="dot"></span> PIN: <b id="currentPinDisplay">----</b>
+      <span class="dot" id="connDot"></span>
+      <span>Me:<b id="topMyPin">----</b> | PC:<b id="topPcPin">----</b></span>
     </div>
     <div class="control-pills">
       <button id="flip-btn" class="pill-btn" onclick="toggleCamera()">🔄 Flip</button>
@@ -175,7 +178,6 @@
       <div class="corner bottom-left"></div>
       <div class="corner bottom-right"></div>
     </div>
-    <!-- Live Recording Badge -->
     <div class="rec-badge" id="recBadge">
       <span class="rec-dot"></span>
       <span id="recTimerText">REC 00:00</span>
@@ -184,7 +186,6 @@
 
   <div id="toast">💖 Transferred! ✨</div>
 
-  <!-- Bottom Section: Mode switch + Shutter -->
   <div class="bottom-section">
     <div class="mode-selector">
       <span class="mode-tab active" id="tabPhoto" onclick="setMode('photo')">PHOTO</span>
@@ -192,12 +193,11 @@
     </div>
 
     <div class="shutter-bar">
-      <button class="action-circle-btn" onclick="document.getElementById('mobileFileInput').click()" title="Send Files/Gallery">
+      <button class="action-circle-btn" onclick="triggerMobileFile()" title="Send Files/Gallery">
         📁
       </button>
       <input type="file" id="mobileFileInput" multiple style="display:none" onchange="sendUniversalFiles(this)" />
 
-      <!-- Main Action Shutter -->
       <div class="shutter-ring" id="shutterRing" onclick="handleShutterClick()">
         <div class="shutter-core" id="shutterCore">🎀</div>
       </div>
@@ -221,13 +221,23 @@
     </div>
   </div>
 
-  <!-- Pair PIN Modal -->
+  <!-- Dual-PIN Pairing Modal -->
   <div class="pin-modal" id="pinModal">
     <div class="pin-box">
-      <h3 style="color:#4c0519; font-size: 18px;">Pair with Laptop 💻</h3>
-      <p style="font-size: 12px; color:#9d174d; margin-top: 4px;">Enter the 4-digit PIN showing on your Laptop screen:</p>
-      <input type="number" id="pinInput" class="pin-input" placeholder="0000" maxlength="4" />
+      <h3 style="color:#4c0519; font-size: 18px;">Dual-PIN Pairing 🎀</h3>
+
+      <div class="my-phone-pin-card">
+        <div style="font-size: 11px; font-weight: 700; color: #9d174d;">1. Ye Phone PIN Laptop me fill karein:</div>
+        <div class="my-phone-pin-val" id="modalMyPin">----</div>
+      </div>
+
+      <div style="font-size: 11px; font-weight: 700; color: #9d174d;">2. Laptop screen wala PIN yahan fill karein:</div>
+      <input type="number" id="pinInput" class="pin-input" placeholder="0000" />
       <button class="pin-btn" onclick="applyPin()">Connect Device 💖</button>
+
+      <div class="mobile-pair-status" id="mobilePairStatus">
+        Dono devices par ek-dusre ka PIN daalein ✨
+      </div>
     </div>
   </div>
 
@@ -243,7 +253,10 @@
     let isBwMode = false;
     let receivedFiles = [];
     let currentFacingMode = "environment";
-    let appMode = "photo"; // 'photo' | 'video'
+    let appMode = "photo";
+
+    let myPhonePin = '----';
+    let connectedLaptopPin = null;
 
     // Video Recording Variables
     let mediaRecorder = null;
@@ -252,34 +265,54 @@
     let recordTimerInterval = null;
     let recordSeconds = 0;
 
-    // PIN Setup
-    const urlParams = new URLSearchParams(window.location.search);
-    let targetPin = urlParams.get('pin') || localStorage.getItem('ghost_phone_pin') || '';
+    // Fresh random PIN generated on every page load/refresh
+    socket.on('assigned_pin', (pin) => {
+      myPhonePin = pin;
+      connectedLaptopPin = null;
+      document.getElementById('topMyPin').innerText = pin;
+      document.getElementById('modalMyPin').innerText = pin;
+      document.getElementById('topPcPin').innerText = '----';
+      document.getElementById('connDot').classList.remove('connected');
+      document.getElementById('pinModal').style.display = 'flex';
+    });
 
     function showPinModal() {
-      document.getElementById('pinInput').value = targetPin;
       document.getElementById('pinModal').style.display = 'flex';
     }
 
     function applyPin() {
       const entered = document.getElementById('pinInput').value.trim();
-      if (!entered) return alert('Please enter 4-digit PIN');
-      targetPin = entered;
-      localStorage.setItem('ghost_phone_pin', targetPin);
-      document.getElementById('currentPinDisplay').innerText = targetPin;
+      if (!entered) return alert('Pehle Laptop ka 4-digit PIN daalein! 💻');
+      socket.emit('pair_request', entered);
+    }
+
+    socket.on('pair_status', (data) => {
+      document.getElementById('mobilePairStatus').innerText = data.msg;
+    });
+
+    socket.on('incoming_pair_hint', ({ fromPin }) => {
+      document.getElementById('mobilePairStatus').innerText =
+        `🔔 Laptop (${fromPin}) connect hona chahta hai! Upar ${fromPin} daal kar Connect dabayein.`;
+    });
+
+    socket.on('paired_success', ({ partnerPin }) => {
+      connectedLaptopPin = partnerPin;
+      document.getElementById('topPcPin').innerText = partnerPin;
+      document.getElementById('connDot').classList.add('connected');
       document.getElementById('pinModal').style.display = 'none';
-      socket.emit('join_room', targetPin);
-      triggerToast(`Connected to PIN ${targetPin} ✨`);
-    }
+      triggerToast(`💖 Paired with Laptop (${partnerPin}) ✨`);
+    });
 
-    if (targetPin) {
-      document.getElementById('currentPinDisplay').innerText = targetPin;
-      socket.emit('join_room', targetPin);
-    } else {
-      showPinModal();
-    }
+    socket.on('partner_disconnected', () => {
+      connectedLaptopPin = null;
+      document.getElementById('topPcPin').innerText = '----';
+      document.getElementById('connDot').classList.remove('connected');
+      document.getElementById('pinInput').value = '';
+      document.getElementById('mobilePairStatus').innerText = '⚠️ Laptop refresh/disconnect ho gaya. Naya PIN daalein!';
+      document.getElementById('pinModal').style.display = 'flex';
+    });
 
-    // Camera Init with Microphone support for Videos
+    // Camera Init
     async function startCamera() {
       if (currentStream) {
         currentStream.getTracks().forEach(track => track.stop());
@@ -340,10 +373,9 @@
       toast.innerText = txt;
       toast.style.display = 'block';
       if (navigator.vibrate) navigator.vibrate(50);
-      setTimeout(() => { toast.style.display = 'none'; }, 1200);
+      setTimeout(() => { toast.style.display = 'none'; }, 1300);
     }
 
-    /* Mode Switching (Photo vs Video) */
     function setMode(mode) {
       if (isRecording) return alert("Stop recording first! 🛑");
       appMode = mode;
@@ -364,9 +396,8 @@
       }
     }
 
-    /* Main Shutter Click Handler */
     function handleShutterClick() {
-      if (!targetPin) return showPinModal();
+      if (!connectedLaptopPin) return showPinModal();
 
       if (appMode === 'photo') {
         snapPhoto();
@@ -379,7 +410,6 @@
       }
     }
 
-    /* 1. Snap Photo Function */
     function snapPhoto() {
       if (!video.videoWidth) return;
       canvas.width = video.videoWidth;
@@ -408,7 +438,6 @@
       triggerToast('💖 Photo Sent to Laptop! ✨');
     }
 
-    /* 2. Video Recording Functions */
     function startVideoRecording() {
       if (!currentStream) return alert("Camera not ready!");
 
@@ -449,7 +478,6 @@
       mediaRecorder.start(1000);
       isRecording = true;
 
-      // UI Updates for Recording
       document.getElementById('shutterRing').classList.add('recording');
       document.getElementById('shutterCore').classList.add('recording');
       document.getElementById('recBadge').style.display = 'inline-flex';
@@ -483,9 +511,13 @@
       document.getElementById('recTimerText').innerText = `REC ${mins}:${secs}`;
     }
 
-    // Universal File Sender (Gallery / Storage)
+    function triggerMobileFile() {
+      if (!connectedLaptopPin) return showPinModal();
+      document.getElementById('mobileFileInput').click();
+    }
+
     async function sendUniversalFiles(input) {
-      if (!targetPin) return showPinModal();
+      if (!connectedLaptopPin) return showPinModal();
       const files = Array.from(input.files);
       if (!files.length) return;
 
@@ -508,7 +540,6 @@
       input.value = '';
     }
 
-    // Inbox Receiver (From Laptop)
     socket.on('receive_file', (file) => {
       receivedFiles.push(file);
       document.getElementById('inbox-count').innerText = receivedFiles.length;
