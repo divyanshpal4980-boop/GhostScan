@@ -12,27 +12,30 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
     body { background: #18040f; height: 100vh; display: flex; flex-direction: column; overflow: hidden; position: relative; }
 
+    /* Top Navigation */
     .top-bar {
       position: absolute; top: 0; left: 0; right: 0; height: 68px;
       display: flex; justify-content: space-between; align-items: center;
-      padding: 0 16px; z-index: 20; background: linear-gradient(180deg, rgba(24, 4, 15, 0.95), transparent);
+      padding: 0 14px; z-index: 20; background: linear-gradient(180deg, rgba(24, 4, 15, 0.95), transparent);
     }
     .badge-live {
-      display: inline-flex; align-items: center; gap: 6px; font-size: 11px;
+      display: inline-flex; align-items: center; gap: 5px; font-size: 11px;
       font-weight: 800; color: #fbcfe8; background: rgba(244, 114, 182, 0.2); border: 1.5px solid #f472b6;
-      padding: 6px 12px; border-radius: 20px; cursor: pointer;
+      padding: 6px 10px; border-radius: 20px; cursor: pointer;
     }
     .dot { width: 7px; height: 7px; background: #f472b6; border-radius: 50%; }
 
-    .control-pills { display: flex; gap: 6px; }
+    .control-pills { display: flex; gap: 5px; }
     .pill-btn {
       background: rgba(255,255,255,0.14); border: 1.5px solid rgba(255,255,255,0.25);
-      color: #fff; padding: 7px 12px; border-radius: 20px; font-size: 11px; font-weight: 700;
-      cursor: pointer; backdrop-filter: blur(8px);
+      color: #fff; padding: 6px 10px; border-radius: 20px; font-size: 11px; font-weight: 700;
+      cursor: pointer; backdrop-filter: blur(8px); transition: 0.15s;
     }
+    .pill-btn:active { transform: scale(0.92); }
     .pill-btn.active { background: #ec4899; border-color: #f472b6; }
     .inbox-badge { background: #3b82f6; border-color: #60a5fa; color: #fff; }
 
+    /* Camera Viewport */
     .viewport { flex: 1; position: relative; display: flex; justify-content: center; align-items: center; }
     video { width: 100%; height: 100%; object-fit: cover; }
     .viewfinder { position: absolute; width: 84%; height: 75%; pointer-events: none; border-radius: 20px; }
@@ -42,34 +45,78 @@
     .bottom-left { bottom: 0; left: 0; border-bottom-width: 4px; border-left-width: 4px; border-bottom-left-radius: 12px; }
     .bottom-right { bottom: 0; right: 0; border-bottom-width: 4px; border-right-width: 4px; border-bottom-right-radius: 12px; }
 
+    /* Recording Timer Badge */
+    .rec-badge {
+      position: absolute; top: 80px; left: 50%; transform: translateX(-50%);
+      background: rgba(225, 29, 72, 0.9); color: #fff; padding: 6px 16px;
+      border-radius: 20px; font-size: 13px; font-weight: 800; display: none;
+      align-items: center; gap: 8px; z-index: 25; box-shadow: 0 0 16px rgba(225, 29, 72, 0.6);
+    }
+    .rec-dot { width: 8px; height: 8px; background: #fff; border-radius: 50%; animation: pulse 1s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    /* Bottom Controller Area */
+    .bottom-section {
+      background: #18040f; display: flex; flex-direction: column; align-items: center;
+      padding-bottom: 12px; z-index: 20;
+    }
+
+    /* Mode Selector (Photo vs Video) */
+    .mode-selector {
+      display: flex; gap: 18px; margin: 8px 0 12px;
+    }
+    .mode-tab {
+      font-size: 12px; font-weight: 800; color: rgba(255,255,255,0.5); letter-spacing: 1px;
+      cursor: pointer; transition: 0.2s; padding: 3px 10px; border-radius: 12px;
+    }
+    .mode-tab.active {
+      color: #fbcfe8; background: rgba(244, 114, 182, 0.25); text-shadow: 0 0 8px rgba(244,114,182,0.8);
+    }
+
+    /* Shutter Bar */
     .shutter-bar {
-      height: 130px; background: #18040f; display: flex;
-      justify-content: space-evenly; align-items: center; z-index: 20; padding: 0 16px;
+      width: 100%; display: flex; justify-content: space-evenly; align-items: center; padding: 0 16px;
     }
     .action-circle-btn {
-      width: 52px; height: 52px; border-radius: 50%;
+      width: 50px; height: 50px; border-radius: 50%;
       background: rgba(255, 255, 255, 0.12); border: 2px solid #f472b6;
       color: #fff; font-size: 20px; display: flex; justify-content: center;
-      align-items: center; cursor: pointer;
+      align-items: center; cursor: pointer; transition: 0.15s;
     }
+    .action-circle-btn:active { transform: scale(0.9); }
+
     .shutter-ring {
       width: 78px; height: 78px; border-radius: 50%; border: 3.5px solid #fbcfe8;
       display: flex; justify-content: center; align-items: center; cursor: pointer;
+      transition: all 0.2s;
     }
+    .shutter-ring:active { transform: scale(0.92); }
+    .shutter-ring.recording {
+      border-color: #ef4444; box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
+    }
+
     .shutter-core {
       width: 62px; height: 62px; border-radius: 50%;
       background: linear-gradient(135deg, #f472b6, #db2777);
       display: flex; justify-content: center; align-items: center; font-size: 20px; color: #fff;
+      transition: all 0.2s;
+    }
+    .shutter-core.video-mode {
+      background: linear-gradient(135deg, #ef4444, #b91c1c);
+    }
+    .shutter-core.recording {
+      width: 32px; height: 32px; border-radius: 8px; background: #ef4444; font-size: 0;
     }
 
+    /* Toast */
     #toast {
-      position: absolute; bottom: 145px; left: 50%; transform: translateX(-50%);
+      position: absolute; bottom: 160px; left: 50%; transform: translateX(-50%);
       background: #ffffff; border: 2px solid #f472b6; color: #be185d;
       padding: 9px 20px; border-radius: 25px; font-size: 13px; font-weight: 800;
-      display: none; z-index: 30;
+      display: none; z-index: 30; box-shadow: 0 4px 15px rgba(244, 114, 182, 0.4);
     }
 
-    /* Laptop Inbox Drawer */
+    /* Drawer */
     .drawer {
       position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(5px);
       z-index: 100; display: none; flex-direction: column; justify-content: flex-end;
@@ -87,7 +134,7 @@
       border-radius: 20px; font-size: 12px; font-weight: 700; cursor: pointer;
     }
 
-    /* Pair PIN Modal */
+    /* PIN Modal */
     .pin-modal {
       position: fixed; inset: 0; background: rgba(24, 4, 15, 0.95);
       z-index: 150; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 24px;
@@ -110,40 +157,55 @@
 
   <div class="top-bar">
     <div class="badge-live" onclick="showPinModal()">
-      <span class="dot"></span> PIN: <b id="currentPinDisplay">----</b> 🔄
+      <span class="dot"></span> PIN: <b id="currentPinDisplay">----</b>
     </div>
     <div class="control-pills">
-      <button class="pill-btn inbox-badge" onclick="openDrawer()">📥 (<span id="inbox-count">0</span>)</button>
+      <button id="flip-btn" class="pill-btn" onclick="toggleCamera()">🔄 Flip</button>
       <button id="torch-btn" class="pill-btn" onclick="toggleTorch()">✨ Flash</button>
       <button id="filter-btn" class="pill-btn" onclick="toggleFilter()">🌸 Color</button>
+      <button class="pill-btn inbox-badge" onclick="openDrawer()">📥 (<span id="inbox-count">0</span>)</button>
     </div>
   </div>
 
   <div class="viewport">
-    <video id="cam" autoplay playsinline></video>
+    <video id="cam" autoplay playsinline muted></video>
     <div class="viewfinder">
       <div class="corner top-left"></div>
       <div class="corner top-right"></div>
       <div class="corner bottom-left"></div>
       <div class="corner bottom-right"></div>
     </div>
+    <!-- Live Recording Badge -->
+    <div class="rec-badge" id="recBadge">
+      <span class="rec-dot"></span>
+      <span id="recTimerText">REC 00:00</span>
+    </div>
   </div>
 
   <div id="toast">💖 Transferred! ✨</div>
 
-  <div class="shutter-bar">
-    <button class="action-circle-btn" onclick="document.getElementById('mobileFileInput').click()" title="Send File/Video/Music">
-      📁
-    </button>
-    <input type="file" id="mobileFileInput" multiple style="display:none" onchange="sendUniversalFiles(this)" />
-
-    <div class="shutter-ring" id="snap">
-      <div class="shutter-core">🎀</div>
+  <!-- Bottom Section: Mode switch + Shutter -->
+  <div class="bottom-section">
+    <div class="mode-selector">
+      <span class="mode-tab active" id="tabPhoto" onclick="setMode('photo')">PHOTO</span>
+      <span class="mode-tab" id="tabVideo" onclick="setMode('video')">VIDEO</span>
     </div>
 
-    <button class="action-circle-btn" onclick="openDrawer()" title="Received from Laptop">
-      📥
-    </button>
+    <div class="shutter-bar">
+      <button class="action-circle-btn" onclick="document.getElementById('mobileFileInput').click()" title="Send Files/Gallery">
+        📁
+      </button>
+      <input type="file" id="mobileFileInput" multiple style="display:none" onchange="sendUniversalFiles(this)" />
+
+      <!-- Main Action Shutter -->
+      <div class="shutter-ring" id="shutterRing" onclick="handleShutterClick()">
+        <div class="shutter-core" id="shutterCore">🎀</div>
+      </div>
+
+      <button class="action-circle-btn" onclick="openDrawer()" title="Received from Laptop">
+        📥
+      </button>
+    </div>
   </div>
 
   <!-- Laptop Inbox Drawer -->
@@ -175,12 +237,22 @@
     const socket = io();
     const video = document.getElementById('cam');
     const canvas = document.getElementById('canvas');
+    let currentStream = null;
     let videoTrack = null;
     let isTorchOn = false;
     let isBwMode = false;
     let receivedFiles = [];
+    let currentFacingMode = "environment";
+    let appMode = "photo"; // 'photo' | 'video'
 
-    // Check PIN from URL query (?pin=1234) or saved
+    // Video Recording Variables
+    let mediaRecorder = null;
+    let recordedChunks = [];
+    let isRecording = false;
+    let recordTimerInterval = null;
+    let recordSeconds = 0;
+
+    // PIN Setup
     const urlParams = new URLSearchParams(window.location.search);
     let targetPin = urlParams.get('pin') || localStorage.getItem('ghost_phone_pin') || '';
 
@@ -207,19 +279,49 @@
       showPinModal();
     }
 
-    navigator.mediaDevices.getUserMedia({
-      video: { facingMode: { ideal: "environment" }, width: { ideal: 1920 }, height: { ideal: 1080 } },
-      audio: false
-    }).then(stream => {
-      video.srcObject = stream;
-      videoTrack = stream.getVideoTracks()[0];
-    }).catch(err => alert("Camera permission error: " + err));
+    // Camera Init with Microphone support for Videos
+    async function startCamera() {
+      if (currentStream) {
+        currentStream.getTracks().forEach(track => track.stop());
+      }
+      try {
+        let stream;
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: { ideal: currentFacingMode }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+            audio: true
+          });
+        } catch (audioErr) {
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: { ideal: currentFacingMode }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+            audio: false
+          });
+        }
+        currentStream = stream;
+        video.srcObject = stream;
+        videoTrack = stream.getVideoTracks()[0];
+
+        isTorchOn = false;
+        document.getElementById('torch-btn').classList.remove('active');
+      } catch (err) {
+        alert("Camera error: " + err);
+      }
+    }
+
+    startCamera();
+
+    async function toggleCamera() {
+      if (isRecording) return alert("Stop recording first! 🛑");
+      currentFacingMode = (currentFacingMode === "environment") ? "user" : "environment";
+      await startCamera();
+      triggerToast(currentFacingMode === "user" ? "🤳 Front Camera" : "📸 Back Camera");
+    }
 
     async function toggleTorch() {
       if (!videoTrack) return;
       try {
         const capabilities = videoTrack.getCapabilities ? videoTrack.getCapabilities() : {};
-        if (!capabilities.torch) return alert("Torch not supported 🌸");
+        if (!capabilities.torch) return alert("Torch not supported on this camera 🌸");
         isTorchOn = !isTorchOn;
         await videoTrack.applyConstraints({ advanced: [{ torch: isTorchOn }] });
         document.getElementById('torch-btn').classList.toggle('active', isTorchOn);
@@ -238,16 +340,56 @@
       toast.innerText = txt;
       toast.style.display = 'block';
       if (navigator.vibrate) navigator.vibrate(50);
-      setTimeout(() => { toast.style.display = 'none'; }, 1100);
+      setTimeout(() => { toast.style.display = 'none'; }, 1200);
     }
 
-    // Camera Snap to paired Laptop
-    document.getElementById('snap').onclick = () => {
+    /* Mode Switching (Photo vs Video) */
+    function setMode(mode) {
+      if (isRecording) return alert("Stop recording first! 🛑");
+      appMode = mode;
+      const tabPhoto = document.getElementById('tabPhoto');
+      const tabVideo = document.getElementById('tabVideo');
+      const core = document.getElementById('shutterCore');
+
+      if (mode === 'photo') {
+        tabPhoto.classList.add('active');
+        tabVideo.classList.remove('active');
+        core.classList.remove('video-mode');
+        core.innerText = "🎀";
+      } else {
+        tabVideo.classList.add('active');
+        tabPhoto.classList.remove('active');
+        core.classList.add('video-mode');
+        core.innerText = "🎥";
+      }
+    }
+
+    /* Main Shutter Click Handler */
+    function handleShutterClick() {
       if (!targetPin) return showPinModal();
+
+      if (appMode === 'photo') {
+        snapPhoto();
+      } else {
+        if (!isRecording) {
+          startVideoRecording();
+        } else {
+          stopVideoRecording();
+        }
+      }
+    }
+
+    /* 1. Snap Photo Function */
+    function snapPhoto() {
       if (!video.videoWidth) return;
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
       const ctx = canvas.getContext('2d');
+
+      if (currentFacingMode === "user") {
+        ctx.translate(canvas.width, 0);
+        ctx.scale(-1, 1);
+      }
       ctx.drawImage(video, 0, 0);
 
       if (isBwMode) {
@@ -263,10 +405,85 @@
 
       const base64Img = canvas.toDataURL('image/jpeg', 0.9).split(',')[1];
       socket.emit('send_frame', base64Img);
-      triggerToast('💖 Sent to Laptop ✨');
-    };
+      triggerToast('💖 Photo Sent to Laptop! ✨');
+    }
 
-    // Universal File Sender
+    /* 2. Video Recording Functions */
+    function startVideoRecording() {
+      if (!currentStream) return alert("Camera not ready!");
+
+      recordedChunks = [];
+      const options = { mimeType: 'video/webm;codecs=vp8,opus' };
+      try {
+        mediaRecorder = new MediaRecorder(currentStream, MediaRecorder.isTypeSupported(options.mimeType) ? options : undefined);
+      } catch (e) {
+        mediaRecorder = new MediaRecorder(currentStream);
+      }
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data && event.data.size > 0) {
+          recordedChunks.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = () => {
+        const mimeType = mediaRecorder.mimeType || 'video/webm';
+        const blob = new Blob(recordedChunks, { type: mimeType });
+        const ext = mimeType.includes('mp4') ? 'mp4' : 'webm';
+
+        triggerToast('⏳ Uploading Video to PC...');
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          socket.emit('send_file', {
+            name: `Recorded_Video_${Date.now()}.${ext}`,
+            type: mimeType,
+            size: blob.size,
+            data: e.target.result
+          });
+          triggerToast('🎥 Video Sent to Laptop! ✨');
+        };
+        reader.readAsDataURL(blob);
+      };
+
+      mediaRecorder.start(1000);
+      isRecording = true;
+
+      // UI Updates for Recording
+      document.getElementById('shutterRing').classList.add('recording');
+      document.getElementById('shutterCore').classList.add('recording');
+      document.getElementById('recBadge').style.display = 'inline-flex';
+
+      recordSeconds = 0;
+      updateTimerDisplay();
+      recordTimerInterval = setInterval(() => {
+        recordSeconds++;
+        updateTimerDisplay();
+      }, 1000);
+
+      if (navigator.vibrate) navigator.vibrate(80);
+    }
+
+    function stopVideoRecording() {
+      if (!mediaRecorder || !isRecording) return;
+      mediaRecorder.stop();
+      isRecording = false;
+
+      clearInterval(recordTimerInterval);
+      document.getElementById('shutterRing').classList.remove('recording');
+      document.getElementById('shutterCore').classList.remove('recording');
+      document.getElementById('recBadge').style.display = 'none';
+
+      if (navigator.vibrate) navigator.vibrate([40, 40, 40]);
+    }
+
+    function updateTimerDisplay() {
+      const mins = String(Math.floor(recordSeconds / 60)).padStart(2, '0');
+      const secs = String(recordSeconds % 60).padStart(2, '0');
+      document.getElementById('recTimerText').innerText = `REC ${mins}:${secs}`;
+    }
+
+    // Universal File Sender (Gallery / Storage)
     async function sendUniversalFiles(input) {
       if (!targetPin) return showPinModal();
       const files = Array.from(input.files);
@@ -291,7 +508,7 @@
       input.value = '';
     }
 
-    // Inbox Receiver
+    // Inbox Receiver (From Laptop)
     socket.on('receive_file', (file) => {
       receivedFiles.push(file);
       document.getElementById('inbox-count').innerText = receivedFiles.length;
