@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#18040f">
   <title>Divyansh Mobile 🎀</title>
   <script src="/socket.io/socket.io.js"></script>
@@ -10,11 +10,25 @@
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&display=swap');
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
-    body { background: #18040f; height: 100vh; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+    
+    html, body {
+      height: 100%;
+      height: 100dvh; /* Dynamic mobile screen fit */
+      width: 100vw;
+      overflow: hidden;
+      background: #18040f;
+    }
 
-    /* Top Navigation */
+    body {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Navigation Bar */
     .top-bar {
-      position: absolute; top: 0; left: 0; right: 0; height: 68px;
+      position: absolute; top: 0; left: 0; right: 0; height: 60px;
       display: flex; justify-content: space-between; align-items: center;
       padding: 0 12px; z-index: 20; background: linear-gradient(180deg, rgba(24, 4, 15, 0.95), transparent);
     }
@@ -29,18 +43,28 @@
     .control-pills { display: flex; gap: 4px; }
     .pill-btn {
       background: rgba(255,255,255,0.14); border: 1.5px solid rgba(255,255,255,0.25);
-      color: #fff; padding: 6px 9px; border-radius: 20px; font-size: 11px; font-weight: 700;
+      color: #fff; padding: 5px 8px; border-radius: 20px; font-size: 11px; font-weight: 700;
       cursor: pointer; backdrop-filter: blur(8px); transition: 0.15s;
     }
     .pill-btn:active { transform: scale(0.92); }
     .pill-btn.active { background: #ec4899; border-color: #f472b6; }
     .inbox-badge { background: #3b82f6; border-color: #60a5fa; color: #fff; }
 
-    /* Camera Viewport */
-    .viewport { flex: 1; position: relative; display: flex; justify-content: center; align-items: center; }
+    /* Viewport (Locked Flex so it never pushes bottom controls out) */
+    .viewport {
+      flex: 1;
+      min-height: 0; /* Crucial for mobile Chrome flex layout */
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      background: #000;
+    }
     video { width: 100%; height: 100%; object-fit: cover; }
-    .viewfinder { position: absolute; width: 84%; height: 75%; pointer-events: none; border-radius: 20px; }
-    .corner { position: absolute; width: 28px; height: 28px; border-color: #f472b6; border-style: solid; border-width: 0; }
+    
+    .viewfinder { position: absolute; width: 84%; height: 74%; pointer-events: none; border-radius: 20px; }
+    .corner { position: absolute; width: 26px; height: 26px; border-color: #f472b6; border-style: solid; border-width: 0; }
     .top-left { top: 0; left: 0; border-top-width: 4px; border-left-width: 4px; border-top-left-radius: 12px; }
     .top-right { top: 0; right: 0; border-top-width: 4px; border-right-width: 4px; border-top-right-radius: 12px; }
     .bottom-left { bottom: 0; left: 0; border-bottom-width: 4px; border-left-width: 4px; border-bottom-left-radius: 12px; }
@@ -48,23 +72,29 @@
 
     /* Recording Timer Badge */
     .rec-badge {
-      position: absolute; top: 80px; left: 50%; transform: translateX(-50%);
-      background: rgba(225, 29, 72, 0.9); color: #fff; padding: 6px 16px;
-      border-radius: 20px; font-size: 13px; font-weight: 800; display: none;
-      align-items: center; gap: 8px; z-index: 25; box-shadow: 0 0 16px rgba(225, 29, 72, 0.6);
+      position: absolute; top: 70px; left: 50%; transform: translateX(-50%);
+      background: rgba(225, 29, 72, 0.9); color: #fff; padding: 5px 14px;
+      border-radius: 20px; font-size: 12px; font-weight: 800; display: none;
+      align-items: center; gap: 7px; z-index: 25; box-shadow: 0 0 16px rgba(225, 29, 72, 0.6);
     }
-    .rec-dot { width: 8px; height: 8px; background: #fff; border-radius: 50%; animation: pulse 1s infinite; }
+    .rec-dot { width: 7px; height: 7px; background: #fff; border-radius: 50%; animation: pulse 1s infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-    /* Bottom Controller Area */
+    /* Bottom Controller Area (Fixed height + Safe Area) */
     .bottom-section {
-      background: #18040f; display: flex; flex-direction: column; align-items: center;
-      padding-bottom: 12px; z-index: 20;
+      flex-shrink: 0;
+      background: #18040f;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 8px;
+      padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+      z-index: 20;
     }
 
-    .mode-selector { display: flex; gap: 18px; margin: 8px 0 12px; }
+    .mode-selector { display: flex; gap: 14px; margin-bottom: 8px; }
     .mode-tab {
-      font-size: 12px; font-weight: 800; color: rgba(255,255,255,0.5); letter-spacing: 1px;
+      font-size: 11px; font-weight: 800; color: rgba(255,255,255,0.45); letter-spacing: 1px;
       cursor: pointer; transition: 0.2s; padding: 3px 10px; border-radius: 12px;
     }
     .mode-tab.active {
@@ -75,15 +105,15 @@
       width: 100%; display: flex; justify-content: space-evenly; align-items: center; padding: 0 16px;
     }
     .action-circle-btn {
-      width: 50px; height: 50px; border-radius: 50%;
+      width: 48px; height: 48px; border-radius: 50%;
       background: rgba(255, 255, 255, 0.12); border: 2px solid #f472b6;
-      color: #fff; font-size: 20px; display: flex; justify-content: center;
+      color: #fff; font-size: 19px; display: flex; justify-content: center;
       align-items: center; cursor: pointer; transition: 0.15s;
     }
     .action-circle-btn:active { transform: scale(0.9); }
 
     .shutter-ring {
-      width: 78px; height: 78px; border-radius: 50%; border: 3.5px solid #fbcfe8;
+      width: 72px; height: 72px; border-radius: 50%; border: 3px solid #fbcfe8;
       display: flex; justify-content: center; align-items: center; cursor: pointer;
       transition: all 0.2s;
     }
@@ -91,18 +121,18 @@
     .shutter-ring.recording { border-color: #ef4444; box-shadow: 0 0 20px rgba(239, 68, 68, 0.6); }
 
     .shutter-core {
-      width: 62px; height: 62px; border-radius: 50%;
+      width: 58px; height: 58px; border-radius: 50%;
       background: linear-gradient(135deg, #f472b6, #db2777);
-      display: flex; justify-content: center; align-items: center; font-size: 20px; color: #fff;
+      display: flex; justify-content: center; align-items: center; font-size: 19px; color: #fff;
       transition: all 0.2s;
     }
     .shutter-core.video-mode { background: linear-gradient(135deg, #ef4444, #b91c1c); }
-    .shutter-core.recording { width: 32px; height: 32px; border-radius: 8px; background: #ef4444; font-size: 0; }
+    .shutter-core.recording { width: 28px; height: 28px; border-radius: 6px; background: #ef4444; font-size: 0; }
 
     #toast {
-      position: absolute; bottom: 160px; left: 50%; transform: translateX(-50%);
+      position: absolute; bottom: 140px; left: 50%; transform: translateX(-50%);
       background: #ffffff; border: 2px solid #f472b6; color: #be185d;
-      padding: 9px 20px; border-radius: 25px; font-size: 13px; font-weight: 800;
+      padding: 8px 18px; border-radius: 25px; font-size: 12px; font-weight: 800;
       display: none; z-index: 30; box-shadow: 0 4px 15px rgba(244, 114, 182, 0.4);
     }
 
@@ -130,27 +160,27 @@
       z-index: 150; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px;
     }
     .pin-box {
-      background: #fff; padding: 24px 20px; border-radius: 26px; width: 100%; max-width: 340px; text-align: center;
+      background: #fff; padding: 22px 18px; border-radius: 26px; width: 100%; max-width: 340px; text-align: center;
       border: 2.5px solid #f472b6; box-shadow: 0 15px 35px rgba(244, 114, 182, 0.35);
     }
     .my-phone-pin-card {
       background: #fff0f6; border: 2px dashed #f472b6; border-radius: 16px;
-      padding: 12px; margin: 12px 0;
+      padding: 10px; margin: 10px 0;
     }
     .my-phone-pin-val {
-      font-size: 32px; font-weight: 800; letter-spacing: 6px; color: #be185d; margin-top: 2px;
+      font-size: 30px; font-weight: 800; letter-spacing: 6px; color: #be185d; margin-top: 2px;
     }
     .pin-input {
-      width: 100%; font-size: 26px; font-weight: 800; text-align: center; letter-spacing: 6px;
-      padding: 10px; border-radius: 14px; border: 2px solid #f472b6; margin: 10px 0 14px; outline: none; color: #4c0519;
+      width: 100%; font-size: 24px; font-weight: 800; text-align: center; letter-spacing: 6px;
+      padding: 10px; border-radius: 14px; border: 2px solid #f472b6; margin: 8px 0 12px; outline: none; color: #4c0519;
     }
     .pin-btn {
-      width: 100%; background: linear-gradient(135deg, #f472b6, #ec4899); color: #fff; font-size: 15px; font-weight: 800;
-      padding: 13px; border: none; border-radius: 18px; cursor: pointer;
+      width: 100%; background: linear-gradient(135deg, #f472b6, #ec4899); color: #fff; font-size: 14px; font-weight: 800;
+      padding: 12px; border: none; border-radius: 18px; cursor: pointer;
     }
     .mobile-pair-status {
-      margin-top: 12px; font-size: 12px; font-weight: 700; color: #9d174d;
-      background: #fdf2f8; padding: 8px 10px; border-radius: 12px;
+      margin-top: 10px; font-size: 11px; font-weight: 700; color: #9d174d;
+      background: #fdf2f8; padding: 7px 9px; border-radius: 12px;
     }
     canvas { display: none; }
   </style>
@@ -224,7 +254,7 @@
   <!-- Dual-PIN Pairing Modal -->
   <div class="pin-modal" id="pinModal">
     <div class="pin-box">
-      <h3 style="color:#4c0519; font-size: 18px;">Dual-PIN Pairing 🎀</h3>
+      <h3 style="color:#4c0519; font-size: 17px;">Dual-PIN Pairing 🎀</h3>
 
       <div class="my-phone-pin-card">
         <div style="font-size: 11px; font-weight: 700; color: #9d174d;">1. Ye Phone PIN Laptop me fill karein:</div>
@@ -258,14 +288,12 @@
     let myPhonePin = '----';
     let connectedLaptopPin = null;
 
-    // Video Recording Variables
     let mediaRecorder = null;
     let recordedChunks = [];
     let isRecording = false;
     let recordTimerInterval = null;
     let recordSeconds = 0;
 
-    // Fresh random PIN generated on every page load/refresh
     socket.on('assigned_pin', (pin) => {
       myPhonePin = pin;
       connectedLaptopPin = null;
@@ -312,7 +340,6 @@
       document.getElementById('pinModal').style.display = 'flex';
     });
 
-    // Camera Init
     async function startCamera() {
       if (currentStream) {
         currentStream.getTracks().forEach(track => track.stop());
