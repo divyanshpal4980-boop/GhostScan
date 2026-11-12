@@ -9,28 +9,37 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&display=swap');
 
+    :root {
+      --app-height: 100dvh;
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
     
     html, body {
-      height: 100%;
-      height: 100dvh; /* Dynamic mobile screen fit */
-      width: 100vw;
+      width: 100%;
+      height: var(--app-height);
+      max-height: var(--app-height);
       overflow: hidden;
       background: #18040f;
     }
 
     body {
-      position: fixed;
-      inset: 0;
       display: flex;
       flex-direction: column;
+      justify-content: space-between;
     }
 
     /* Top Navigation Bar */
     .top-bar {
-      position: absolute; top: 0; left: 0; right: 0; height: 60px;
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 0 12px; z-index: 20; background: linear-gradient(180deg, rgba(24, 4, 15, 0.95), transparent);
+      flex-shrink: 0;
+      height: 56px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 12px;
+      z-index: 20;
+      background: #18040f;
+      border-bottom: 1px solid rgba(244, 114, 182, 0.2);
     }
     .badge-live {
       display: inline-flex; align-items: center; gap: 5px; font-size: 10px;
@@ -44,16 +53,16 @@
     .pill-btn {
       background: rgba(255,255,255,0.14); border: 1.5px solid rgba(255,255,255,0.25);
       color: #fff; padding: 5px 8px; border-radius: 20px; font-size: 11px; font-weight: 700;
-      cursor: pointer; backdrop-filter: blur(8px); transition: 0.15s;
+      cursor: pointer; transition: 0.15s;
     }
     .pill-btn:active { transform: scale(0.92); }
     .pill-btn.active { background: #ec4899; border-color: #f472b6; }
     .inbox-badge { background: #3b82f6; border-color: #60a5fa; color: #fff; }
 
-    /* Viewport (Locked Flex so it never pushes bottom controls out) */
+    /* Camera Viewport */
     .viewport {
       flex: 1;
-      min-height: 0; /* Crucial for mobile Chrome flex layout */
+      min-height: 0;
       position: relative;
       display: flex;
       justify-content: center;
@@ -61,9 +70,15 @@
       overflow: hidden;
       background: #000;
     }
-    video { width: 100%; height: 100%; object-fit: cover; }
+    video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
     
-    .viewfinder { position: absolute; width: 84%; height: 74%; pointer-events: none; border-radius: 20px; }
+    .viewfinder { position: relative; width: 82%; height: 78%; pointer-events: none; border-radius: 20px; z-index: 5; }
     .corner { position: absolute; width: 26px; height: 26px; border-color: #f472b6; border-style: solid; border-width: 0; }
     .top-left { top: 0; left: 0; border-top-width: 4px; border-left-width: 4px; border-top-left-radius: 12px; }
     .top-right { top: 0; right: 0; border-top-width: 4px; border-right-width: 4px; border-top-right-radius: 12px; }
@@ -72,37 +87,40 @@
 
     /* Recording Timer Badge */
     .rec-badge {
-      position: absolute; top: 70px; left: 50%; transform: translateX(-50%);
-      background: rgba(225, 29, 72, 0.9); color: #fff; padding: 5px 14px;
+      position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+      background: rgba(225, 29, 72, 0.92); color: #fff; padding: 5px 14px;
       border-radius: 20px; font-size: 12px; font-weight: 800; display: none;
       align-items: center; gap: 7px; z-index: 25; box-shadow: 0 0 16px rgba(225, 29, 72, 0.6);
     }
     .rec-dot { width: 7px; height: 7px; background: #fff; border-radius: 50%; animation: pulse 1s infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-    /* Bottom Controller Area (Fixed height + Safe Area) */
+    /* Bottom Controller Area */
     .bottom-section {
       flex-shrink: 0;
       background: #18040f;
+      border-top: 1px solid rgba(244, 114, 182, 0.2);
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding-top: 8px;
-      padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+      padding: 8px 12px 18px;
       z-index: 20;
     }
 
-    .mode-selector { display: flex; gap: 14px; margin-bottom: 8px; }
+    .mode-selector { display: flex; gap: 16px; margin-bottom: 8px; }
     .mode-tab {
       font-size: 11px; font-weight: 800; color: rgba(255,255,255,0.45); letter-spacing: 1px;
-      cursor: pointer; transition: 0.2s; padding: 3px 10px; border-radius: 12px;
+      cursor: pointer; transition: 0.2s; padding: 3px 12px; border-radius: 12px;
     }
     .mode-tab.active {
-      color: #fbcfe8; background: rgba(244, 114, 182, 0.25); text-shadow: 0 0 8px rgba(244,114,182,0.8);
+      color: #fbcfe8; background: rgba(244, 114, 182, 0.28); text-shadow: 0 0 8px rgba(244,114,182,0.8);
     }
 
     .shutter-bar {
-      width: 100%; display: flex; justify-content: space-evenly; align-items: center; padding: 0 16px;
+      width: 100%;
+      display: flex;
+      justify-content: space-evenly;
+      align-items: center;
     }
     .action-circle-btn {
       width: 48px; height: 48px; border-radius: 50%;
@@ -113,7 +131,7 @@
     .action-circle-btn:active { transform: scale(0.9); }
 
     .shutter-ring {
-      width: 72px; height: 72px; border-radius: 50%; border: 3px solid #fbcfe8;
+      width: 68px; height: 68px; border-radius: 50%; border: 3px solid #fbcfe8;
       display: flex; justify-content: center; align-items: center; cursor: pointer;
       transition: all 0.2s;
     }
@@ -121,19 +139,20 @@
     .shutter-ring.recording { border-color: #ef4444; box-shadow: 0 0 20px rgba(239, 68, 68, 0.6); }
 
     .shutter-core {
-      width: 58px; height: 58px; border-radius: 50%;
+      width: 54px; height: 54px; border-radius: 50%;
       background: linear-gradient(135deg, #f472b6, #db2777);
-      display: flex; justify-content: center; align-items: center; font-size: 19px; color: #fff;
+      display: flex; justify-content: center; align-items: center; font-size: 18px; color: #fff;
       transition: all 0.2s;
     }
     .shutter-core.video-mode { background: linear-gradient(135deg, #ef4444, #b91c1c); }
-    .shutter-core.recording { width: 28px; height: 28px; border-radius: 6px; background: #ef4444; font-size: 0; }
+    .shutter-core.recording { width: 26px; height: 26px; border-radius: 6px; background: #ef4444; font-size: 0; }
 
     #toast {
-      position: absolute; bottom: 140px; left: 50%; transform: translateX(-50%);
+      position: fixed; bottom: 135px; left: 50%; transform: translateX(-50%);
       background: #ffffff; border: 2px solid #f472b6; color: #be185d;
       padding: 8px 18px; border-radius: 25px; font-size: 12px; font-weight: 800;
       display: none; z-index: 30; box-shadow: 0 4px 15px rgba(244, 114, 182, 0.4);
+      white-space: nowrap;
     }
 
     /* Drawer */
@@ -274,6 +293,17 @@
   <canvas id="canvas"></canvas>
 
   <script>
+    // Exact visible screen height lock (fixes Chrome address bar cut-off)
+    function syncScreenHeight() {
+      const visibleHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+      document.documentElement.style.setProperty('--app-height', visibleHeight + 'px');
+    }
+    syncScreenHeight();
+    window.addEventListener('resize', syncScreenHeight);
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', syncScreenHeight);
+    }
+
     const socket = io();
     const video = document.getElementById('cam');
     const canvas = document.getElementById('canvas');
@@ -328,6 +358,7 @@
       document.getElementById('topPcPin').innerText = partnerPin;
       document.getElementById('connDot').classList.add('connected');
       document.getElementById('pinModal').style.display = 'none';
+      syncScreenHeight();
       triggerToast(`💖 Paired with Laptop (${partnerPin}) ✨`);
     });
 
@@ -363,6 +394,7 @@
 
         isTorchOn = false;
         document.getElementById('torch-btn').classList.remove('active');
+        syncScreenHeight();
       } catch (err) {
         alert("Camera error: " + err);
       }
