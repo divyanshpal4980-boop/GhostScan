@@ -69,6 +69,7 @@
       align-items: center;
       overflow: hidden;
       background: #000;
+      touch-action: none; /* Enables smooth pinch-to-zoom */
     }
     video {
       position: absolute;
@@ -76,14 +77,74 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+      transform-origin: center center;
+      transition: transform 0.08s ease-out;
     }
     
-    .viewfinder { position: relative; width: 82%; height: 78%; pointer-events: none; border-radius: 20px; z-index: 5; }
+    .viewfinder {
+      position: relative;
+      width: 82%;
+      height: 70%;
+      pointer-events: none;
+      border-radius: 20px;
+      z-index: 5;
+      margin-bottom: 34px;
+    }
     .corner { position: absolute; width: 26px; height: 26px; border-color: #f472b6; border-style: solid; border-width: 0; }
     .top-left { top: 0; left: 0; border-top-width: 4px; border-left-width: 4px; border-top-left-radius: 12px; }
     .top-right { top: 0; right: 0; border-top-width: 4px; border-right-width: 4px; border-top-right-radius: 12px; }
     .bottom-left { bottom: 0; left: 0; border-bottom-width: 4px; border-left-width: 4px; border-bottom-left-radius: 12px; }
     .bottom-right { bottom: 0; right: 0; border-bottom-width: 4px; border-right-width: 4px; border-bottom-right-radius: 12px; }
+
+    /* Floating Zoom Bar (Inside Viewport so zero extra vertical height) */
+    .zoom-dock {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 15;
+      background: rgba(24, 4, 15, 0.78);
+      backdrop-filter: blur(10px);
+      border: 1.5px solid rgba(244, 114, 182, 0.45);
+      border-radius: 24px;
+      padding: 5px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+    }
+    .zoom-presets {
+      display: flex;
+      gap: 4px;
+    }
+    .zoom-chip {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fbcfe8;
+      border: none;
+      border-radius: 12px;
+      padding: 3px 7px;
+      font-size: 10px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .zoom-chip.active {
+      background: #ec4899;
+      color: #fff;
+    }
+    .zoom-slider {
+      width: 85px;
+      accent-color: #f472b6;
+      height: 4px;
+      cursor: pointer;
+    }
+    .zoom-readout {
+      font-size: 11px;
+      font-weight: 800;
+      color: #fff;
+      min-width: 32px;
+      text-align: right;
+    }
 
     /* Recording Timer Badge */
     .rec-badge {
@@ -148,7 +209,7 @@
     .shutter-core.recording { width: 26px; height: 26px; border-radius: 6px; background: #ef4444; font-size: 0; }
 
     #toast {
-      position: fixed; bottom: 135px; left: 50%; transform: translateX(-50%);
+      position: fixed; bottom: 175px; left: 50%; transform: translateX(-50%);
       background: #ffffff; border: 2px solid #f472b6; color: #be185d;
       padding: 8px 18px; border-radius: 25px; font-size: 12px; font-weight: 800;
       display: none; z-index: 30; box-shadow: 0 4px 15px rgba(244, 114, 182, 0.4);
@@ -219,7 +280,7 @@
     </div>
   </div>
 
-  <div class="viewport">
+  <div class="viewport" id="cameraViewport">
     <video id="cam" autoplay playsinline muted></video>
     <div class="viewfinder">
       <div class="corner top-left"></div>
@@ -227,6 +288,18 @@
       <div class="corner bottom-left"></div>
       <div class="corner bottom-right"></div>
     </div>
+
+    <!-- Floating Zoom Bar -->
+    <div class="zoom-dock">
+      <div class="zoom-presets">
+        <button class="zoom-chip active" id="zChip1" onclick="applyZoom(1)">1x</button>
+        <button class="zoom-chip" id="zChip2" onclick="applyZoom(2)">2x</button>
+        <button class="zoom-chip" id="zChip3" onclick="applyZoom(3)">3x</button>
+      </div>
+      <input type="range" id="zoomSlider" class="zoom-slider" min="1" max="5" step="0.1" value="1" oninput="applyZoom(this.value)" />
+      <span class="zoom-readout" id="zoomLabel">1.0x</span>
+    </div>
+
     <div class="rec-badge" id="recBadge">
       <span class="rec-dot"></span>
       <span id="recTimerText">REC 00:00</span>
@@ -293,7 +366,7 @@
   <canvas id="canvas"></canvas>
 
   <script>
-    // Exact visible screen height lock (fixes Chrome address bar cut-off)
+    // Exact visible screen height lock
     function syncScreenHeight() {
       const visibleHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
       document.documentElement.style.setProperty('--app-height', visibleHeight + 'px');
@@ -314,6 +387,12 @@
     let receivedFiles = [];
     let currentFacingMode = "environment";
     let appMode = "photo";
+
+    // Zoom State
+    let currentZoom = 1.0;
+    let minZoom = 1.0;
+    let maxZoom = 5.0;
+    let supportsHardwareZoom = false;
 
     let myPhonePin = '----';
     let connectedLaptopPin = null;
@@ -394,6 +473,24 @@
 
         isTorchOn = false;
         document.getElementById('torch-btn').classList.remove('active');
+
+        // Detect Zoom Capabilities
+        const caps = videoTrack.getCapabilities ? videoTrack.getCapabilities() : {};
+        if (caps.zoom) {
+          supportsHardwareZoom = true;
+          minZoom = caps.zoom.min || 1;
+          maxZoom = Math.min(caps.zoom.max || 5, 8);
+        } else {
+          supportsHardwareZoom = false;
+          minZoom = 1;
+          maxZoom = 4;
+        }
+
+        const slider = document.getElementById('zoomSlider');
+        slider.min = minZoom;
+        slider.max = maxZoom;
+        applyZoom(1);
+
         syncScreenHeight();
       } catch (err) {
         alert("Camera error: " + err);
@@ -401,6 +498,61 @@
     }
 
     startCamera();
+
+    /* Apply Zoom (Hardware Native + Smooth Digital Fallback) */
+    async function applyZoom(rawVal) {
+      let val = parseFloat(rawVal);
+      if (isNaN(val)) val = 1.0;
+      val = Math.max(minZoom, Math.min(maxZoom, val));
+      currentZoom = Math.round(val * 10) / 10;
+
+      document.getElementById('zoomSlider').value = currentZoom;
+      document.getElementById('zoomLabel').innerText = currentZoom.toFixed(1) + 'x';
+
+      // Update active preset chip
+      document.getElementById('zChip1').classList.toggle('active', Math.abs(currentZoom - 1) < 0.15);
+      document.getElementById('zChip2').classList.toggle('active', Math.abs(currentZoom - 2) < 0.15);
+      document.getElementById('zChip3').classList.toggle('active', Math.abs(currentZoom - 3) < 0.15);
+
+      if (supportsHardwareZoom && videoTrack) {
+        try {
+          await videoTrack.applyConstraints({ advanced: [{ zoom: currentZoom }] });
+          video.style.transform = 'scale(1)';
+        } catch (e) {
+          video.style.transform = `scale(${currentZoom})`;
+        }
+      } else {
+        video.style.transform = `scale(${currentZoom})`;
+      }
+    }
+
+    /* Two-Finger Pinch-to-Zoom Gesture on Camera Screen */
+    const viewportEl = document.getElementById('cameraViewport');
+    let initialPinchDist = null;
+    let initialPinchZoom = 1.0;
+
+    viewportEl.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 2) {
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        initialPinchDist = Math.hypot(dx, dy);
+        initialPinchZoom = currentZoom;
+      }
+    }, { passive: true });
+
+    viewportEl.addEventListener('touchmove', (e) => {
+      if (e.touches.length === 2 && initialPinchDist) {
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        const currentDist = Math.hypot(dx, dy);
+        const scaleFactor = currentDist / initialPinchDist;
+        applyZoom(initialPinchZoom * scaleFactor);
+      }
+    }, { passive: true });
+
+    viewportEl.addEventListener('touchend', () => {
+      initialPinchDist = null;
+    });
 
     async function toggleCamera() {
       if (isRecording) return alert("Stop recording first! 🛑");
@@ -479,7 +631,17 @@
         ctx.translate(canvas.width, 0);
         ctx.scale(-1, 1);
       }
-      ctx.drawImage(video, 0, 0);
+
+      // If hardware zoom wasn't available, crop canvas center to match digital CSS zoom
+      if (!supportsHardwareZoom && currentZoom > 1) {
+        const sW = video.videoWidth / currentZoom;
+        const sH = video.videoHeight / currentZoom;
+        const sx = (video.videoWidth - sW) / 2;
+        const sy = (video.videoHeight - sH) / 2;
+        ctx.drawImage(video, sx, sy, sW, sH, 0, 0, canvas.width, canvas.height);
+      } else {
+        ctx.drawImage(video, 0, 0);
+      }
 
       if (isBwMode) {
         const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
