@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DivyanshScan ✨ Universal Studio</title>
+  <title>Divyansh ✨ Universal Studio</title>
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -40,10 +40,15 @@
       font-size: 22px; box-shadow: 0 4px 10px rgba(236, 72, 153, 0.3);
     }
     .brand h1 { font-size: 18px; font-weight: 800; color: var(--text-main); }
-    .badge-live {
-      font-size: 11px; color: #9d174d; background: #fce7f3; border: 1px solid #fbcfe8;
-      padding: 4px 10px; border-radius: 20px; font-weight: 700;
+    
+    /* Pairing Badge */
+    .pair-pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: #fdf2f8; border: 2px dashed #f472b6; padding: 5px 14px;
+      border-radius: 20px; font-size: 13px; font-weight: 800; color: #be185d;
+      cursor: pointer;
     }
+    .pair-pill span { background: #be185d; color: #fff; padding: 2px 8px; border-radius: 8px; letter-spacing: 1px; }
 
     .header-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .btn {
@@ -68,8 +73,13 @@
     }
     .empty-state {
       grid-column: 1 / -1; background: #ffffff; border: 2px dashed #f9a8d4;
-      border-radius: 24px; padding: 80px 20px; text-align: center; color: var(--text-muted);
+      border-radius: 24px; padding: 60px 20px; text-align: center; color: var(--text-muted);
     }
+    .qr-banner {
+      margin-top: 15px; display: inline-flex; flex-direction: column; align-items: center;
+      background: #fff5f8; border: 1.5px solid #fbcfe8; padding: 12px; border-radius: 16px;
+    }
+    .qr-banner img { width: 130px; height: 130px; border-radius: 8px; }
 
     .doc-card {
       background: #ffffff; border-radius: 18px; border: 2px solid var(--pookie-border);
@@ -83,7 +93,7 @@
     .preview-box img { max-width: 90%; max-height: 90%; object-fit: contain; }
     .preview-box video { width: 100%; height: 100%; object-fit: cover; }
     .file-icon-box { text-align: center; }
-    .file-icon-box .emoji { font-size: 54px; margin-bottom: 6px; }
+    .file-icon-box .emoji { font-size: 50px; margin-bottom: 6px; }
     .file-icon-box .fname { font-size: 12px; font-weight: 700; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
     .card-footer {
@@ -99,7 +109,7 @@
     .icon-btn:hover { background: #fce7f3; transform: scale(1.1); }
     .icon-btn.delete:hover { background: #ffe4e6; }
 
-    /* Modals */
+    /* Modal Overlay */
     .modal-overlay {
       position: fixed; inset: 0; background: rgba(76, 5, 25, 0.6);
       backdrop-filter: blur(6px); display: none; justify-content: center;
@@ -126,31 +136,33 @@
     <div class="brand">
       <div class="logo-badge">🎀</div>
       <div>
-        <h1>GhostScan Universal ✨</h1>
+        <h1>Divyansh Studio ✨</h1>
       </div>
-      <div class="badge-live">Two-Way Synced</div>
+      <!-- Pair PIN Display -->
+      <div class="pair-pill" onclick="changePin()" title="Click to set custom PIN">
+        Pair PIN: <span id="pinDisplay">----</span> 🔄
+      </div>
     </div>
     <div class="header-actions">
-      <!-- Send File to Phone Button -->
       <button class="btn btn-send" onclick="document.getElementById('pcFileInput').click()">
         📤 Send to Phone
       </button>
       <input type="file" id="pcFileInput" multiple style="display:none;" onchange="sendFilesToPhone(this)" />
 
       <button class="btn btn-danger" onclick="clearAll()">🧹 Clear All</button>
-      <button class="btn btn-secondary" onclick="exportZipJPEGs()">📦 Export Images (ZIP)</button>
-      <button class="btn btn-primary" onclick="exportPDF()">🌸 Export Images (PDF)</button>
+      <button class="btn btn-secondary" onclick="exportZipJPEGs()">📦 Export All (ZIP)</button>
+      <button class="btn btn-primary" onclick="exportPDF()">🌸 Export PDF</button>
     </div>
   </header>
 
   <main>
     <div class="subbar">
-      <span class="count-pill" id="status-counter">✨ Waiting for transfers...</span>
+      <span class="count-pill" id="status-counter">✨ Paired and ready...</span>
     </div>
     <div id="grid"></div>
   </main>
 
-  <!-- Full Image Preview Modal -->
+  <!-- Full Preview Modal -->
   <div class="modal-overlay" id="viewModal">
     <div class="modal-box">
       <div class="modal-header">
@@ -187,11 +199,30 @@
   <script>
     const socket = io();
     const { jsPDF } = window.jspdf;
-    let items = []; // { id, name, type, dataUri, isImage }
+    let items = [];
     let cropper = null;
     let activeCropIndex = null;
 
-    // 1. Camera Scans from Mobile
+    // PIN Setup (Remembered in localStorage or randomly generated)
+    let myPin = localStorage.getItem('ghost_pc_pin') || Math.floor(1000 + Math.random() * 9000).toString();
+    localStorage.setItem('ghost_pc_pin', myPin);
+    document.getElementById('pinDisplay').innerText = myPin;
+
+    // Join private room on connect
+    socket.emit('join_room', myPin);
+
+    function changePin() {
+      const newPin = prompt("Enter a 4-digit PIN for this Laptop:", myPin);
+      if (newPin && newPin.trim()) {
+        myPin = newPin.trim();
+        localStorage.setItem('ghost_pc_pin', myPin);
+        document.getElementById('pinDisplay').innerText = myPin;
+        socket.emit('join_room', myPin);
+        render();
+      }
+    }
+
+    // 1. Scans received only from paired phone
     socket.on('new_page', (base64Img) => {
       items.push({
         id: Date.now() + Math.random(),
@@ -203,7 +234,7 @@
       render();
     });
 
-    // 2. Incoming Files from Phone (Video, Music, PDF, Images)
+    // 2. Files received only from paired phone
     socket.on('receive_file', (file) => {
       items.push({
         id: Date.now() + Math.random(),
@@ -215,7 +246,7 @@
       render();
     });
 
-    // 3. Send Files from Laptop to Phone
+    // 3. Send to Phone inside this private PIN room
     async function sendFilesToPhone(input) {
       const files = Array.from(input.files);
       if (!files.length) return;
@@ -235,7 +266,7 @@
           reader.readAsDataURL(file);
         });
       }
-      alert(`📤 ${files.length} file(s) sent to Phone! ✨`);
+      alert(`📤 ${files.length} file(s) sent to Phone (PIN: ${myPin})!`);
       input.value = '';
     }
 
@@ -245,18 +276,23 @@
       grid.innerHTML = '';
 
       if (items.length === 0) {
-        counter.innerText = '🌸 0 Items in Workspace';
+        counter.innerText = `🌸 Private Room PIN: ${myPin}`;
+        const autoUrl = `${window.location.origin}/mobile.html?pin=${myPin}`;
         grid.innerHTML = `
           <div class="empty-state">
-            <div style="font-size: 40px; margin-bottom: 8px;">🎀 📁 📱</div>
-            <h3>Universal Drop is Live</h3>
-            <p>Send Images, Videos, Music, or PDFs from Phone or Laptop.</p>
+            <div style="font-size: 38px; margin-bottom: 8px;">🎀 📱 💻</div>
+            <h3 style="color:#4c0519;">Ready for Phone Connection</h3>
+            <p style="margin-top:4px;">Enter PIN <b>${myPin}</b> on your phone, or scan the QR below:</p>
+            <div class="qr-banner">
+              <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(autoUrl)}" alt="Scan QR" />
+              <div style="font-size:11px; font-weight:700; margin-top:6px; color:#be185d;">Scan with phone camera</div>
+            </div>
           </div>
         `;
         return;
       }
 
-      counter.innerText = `🎀 Total Items: ${items.length}`;
+      counter.innerText = `🎀 Items: ${items.length} (Room PIN: ${myPin})`;
 
       items.forEach((item, idx) => {
         const card = document.createElement('div');
@@ -266,25 +302,17 @@
         if (item.type.startsWith('image/')) {
           previewHtml = `<div class="preview-box" onclick="openViewModal(${idx})"><img src="${item.dataUri}" /></div>`;
         } else if (item.type.startsWith('video/')) {
-          previewHtml = `
-            <div class="preview-box">
-              <video src="${item.dataUri}" controls playsinline></video>
-            </div>`;
+          previewHtml = `<div class="preview-box"><video src="${item.dataUri}" controls playsinline></video></div>`;
         } else if (item.type.startsWith('audio/')) {
           previewHtml = `
             <div class="preview-box" style="flex-direction:column; padding: 10px;">
               <div class="file-icon-box"><div class="emoji">🎵</div><div class="fname">${item.name}</div></div>
               <audio src="${item.dataUri}" controls style="width: 90%; margin-top: 10px;"></audio>
             </div>`;
-        } else if (item.type.includes('pdf')) {
-          previewHtml = `
-            <div class="preview-box">
-              <div class="file-icon-box"><div class="emoji">📄</div><div class="fname">${item.name}</div></div>
-            </div>`;
         } else {
           previewHtml = `
             <div class="preview-box">
-              <div class="file-icon-box"><div class="emoji">📁</div><div class="fname">${item.name}</div></div>
+              <div class="file-icon-box"><div class="emoji">📄</div><div class="fname">${item.name}</div></div>
             </div>`;
         }
 
@@ -326,7 +354,6 @@
       }
     }
 
-    // Modal preview
     function openViewModal(index) {
       const item = items[index];
       if (!item.isImage) return;
@@ -337,7 +364,6 @@
     }
     function closeViewModal() { document.getElementById('viewModal').style.display = 'none'; }
 
-    // Crop Tool
     function openCropModal(index) {
       activeCropIndex = index;
       const targetImg = document.getElementById('cropTargetImg');
@@ -359,7 +385,6 @@
       render();
     }
 
-    // Multi-image Exports
     async function exportZipJPEGs() {
       const images = items.filter(i => i.isImage);
       if (!images.length) return alert('No images to export!');

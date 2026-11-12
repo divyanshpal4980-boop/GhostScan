@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#18040f">
-  <title>DivyanshScan Mobile 🎀</title>
+  <title>Divyansh Mobile 🎀</title>
   <script src="/socket.io/socket.io.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&display=swap');
@@ -20,7 +20,7 @@
     .badge-live {
       display: inline-flex; align-items: center; gap: 6px; font-size: 11px;
       font-weight: 800; color: #fbcfe8; background: rgba(244, 114, 182, 0.2); border: 1.5px solid #f472b6;
-      padding: 6px 12px; border-radius: 20px;
+      padding: 6px 12px; border-radius: 20px; cursor: pointer;
     }
     .dot { width: 7px; height: 7px; background: #f472b6; border-radius: 50%; }
 
@@ -33,7 +33,6 @@
     .pill-btn.active { background: #ec4899; border-color: #f472b6; }
     .inbox-badge { background: #3b82f6; border-color: #60a5fa; color: #fff; }
 
-    /* Viewport & Viewfinder */
     .viewport { flex: 1; position: relative; display: flex; justify-content: center; align-items: center; }
     video { width: 100%; height: 100%; object-fit: cover; }
     .viewfinder { position: absolute; width: 84%; height: 75%; pointer-events: none; border-radius: 20px; }
@@ -43,7 +42,6 @@
     .bottom-left { bottom: 0; left: 0; border-bottom-width: 4px; border-left-width: 4px; border-bottom-left-radius: 12px; }
     .bottom-right { bottom: 0; right: 0; border-bottom-width: 4px; border-right-width: 4px; border-bottom-right-radius: 12px; }
 
-    /* Shutter Bar */
     .shutter-bar {
       height: 130px; background: #18040f; display: flex;
       justify-content: space-evenly; align-items: center; z-index: 20; padding: 0 16px;
@@ -54,8 +52,6 @@
       color: #fff; font-size: 20px; display: flex; justify-content: center;
       align-items: center; cursor: pointer;
     }
-    .action-circle-btn:active { transform: scale(0.9); }
-
     .shutter-ring {
       width: 78px; height: 78px; border-radius: 50%; border: 3.5px solid #fbcfe8;
       display: flex; justify-content: center; align-items: center; cursor: pointer;
@@ -73,7 +69,7 @@
       display: none; z-index: 30;
     }
 
-    /* Modal for Received Laptop Files */
+    /* Laptop Inbox Drawer */
     .drawer {
       position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(5px);
       z-index: 100; display: none; flex-direction: column; justify-content: flex-end;
@@ -90,15 +86,34 @@
       background: #ec4899; color: #fff; border: none; padding: 6px 14px;
       border-radius: 20px; font-size: 12px; font-weight: 700; cursor: pointer;
     }
+
+    /* Pair PIN Modal */
+    .pin-modal {
+      position: fixed; inset: 0; background: rgba(24, 4, 15, 0.95);
+      z-index: 150; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 24px;
+    }
+    .pin-box {
+      background: #fff; padding: 28px 24px; border-radius: 24px; width: 100%; max-width: 320px; text-align: center;
+    }
+    .pin-input {
+      width: 100%; font-size: 26px; font-weight: 800; text-align: center; letter-spacing: 6px;
+      padding: 10px; border-radius: 14px; border: 2px solid #f472b6; margin: 16px 0; outline: none;
+    }
+    .pin-btn {
+      width: 100%; background: #ec4899; color: #fff; font-size: 15px; font-weight: 800;
+      padding: 12px; border: none; border-radius: 18px; cursor: pointer;
+    }
     canvas { display: none; }
   </style>
 </head>
 <body>
 
   <div class="top-bar">
-    <div class="badge-live"><span class="dot"></span> GhostScan</div>
+    <div class="badge-live" onclick="showPinModal()">
+      <span class="dot"></span> PIN: <b id="currentPinDisplay">----</b> 🔄
+    </div>
     <div class="control-pills">
-      <button class="pill-btn inbox-badge" onclick="openDrawer()">📥 Inbox (<span id="inbox-count">0</span>)</button>
+      <button class="pill-btn inbox-badge" onclick="openDrawer()">📥 (<span id="inbox-count">0</span>)</button>
       <button id="torch-btn" class="pill-btn" onclick="toggleTorch()">✨ Flash</button>
       <button id="filter-btn" class="pill-btn" onclick="toggleFilter()">🌸 Color</button>
     </div>
@@ -117,19 +132,16 @@
   <div id="toast">💖 Transferred! ✨</div>
 
   <div class="shutter-bar">
-    <!-- Send Any File (Video, Audio, Image, PDF) from Phone -->
-    <button class="action-circle-btn" onclick="document.getElementById('mobileFileInput').click()" title="Send Files/Videos/Music">
+    <button class="action-circle-btn" onclick="document.getElementById('mobileFileInput').click()" title="Send File/Video/Music">
       📁
     </button>
     <input type="file" id="mobileFileInput" multiple style="display:none" onchange="sendUniversalFiles(this)" />
 
-    <!-- Camera Snap -->
     <div class="shutter-ring" id="snap">
       <div class="shutter-core">🎀</div>
     </div>
 
-    <!-- Inbox Quick View -->
-    <button class="action-circle-btn" onclick="openDrawer()" title="Received from PC">
+    <button class="action-circle-btn" onclick="openDrawer()" title="Received from Laptop">
       📥
     </button>
   </div>
@@ -142,8 +154,18 @@
         <button style="border:none; background:none; font-size: 20px;" onclick="closeDrawer()">✕</button>
       </div>
       <div id="inboxList">
-        <p style="color: #9d174d; text-align: center; font-size: 13px;">No files received from laptop yet.</p>
+        <p style="color: #9d174d; text-align: center; font-size: 13px;">No files received from this laptop yet.</p>
       </div>
+    </div>
+  </div>
+
+  <!-- Pair PIN Modal -->
+  <div class="pin-modal" id="pinModal">
+    <div class="pin-box">
+      <h3 style="color:#4c0519; font-size: 18px;">Pair with Laptop 💻</h3>
+      <p style="font-size: 12px; color:#9d174d; margin-top: 4px;">Enter the 4-digit PIN showing on your Laptop screen:</p>
+      <input type="number" id="pinInput" class="pin-input" placeholder="0000" maxlength="4" />
+      <button class="pin-btn" onclick="applyPin()">Connect Device 💖</button>
     </div>
   </div>
 
@@ -158,6 +180,33 @@
     let isBwMode = false;
     let receivedFiles = [];
 
+    // Check PIN from URL query (?pin=1234) or saved
+    const urlParams = new URLSearchParams(window.location.search);
+    let targetPin = urlParams.get('pin') || localStorage.getItem('ghost_phone_pin') || '';
+
+    function showPinModal() {
+      document.getElementById('pinInput').value = targetPin;
+      document.getElementById('pinModal').style.display = 'flex';
+    }
+
+    function applyPin() {
+      const entered = document.getElementById('pinInput').value.trim();
+      if (!entered) return alert('Please enter 4-digit PIN');
+      targetPin = entered;
+      localStorage.setItem('ghost_phone_pin', targetPin);
+      document.getElementById('currentPinDisplay').innerText = targetPin;
+      document.getElementById('pinModal').style.display = 'none';
+      socket.emit('join_room', targetPin);
+      triggerToast(`Connected to PIN ${targetPin} ✨`);
+    }
+
+    if (targetPin) {
+      document.getElementById('currentPinDisplay').innerText = targetPin;
+      socket.emit('join_room', targetPin);
+    } else {
+      showPinModal();
+    }
+
     navigator.mediaDevices.getUserMedia({
       video: { facingMode: { ideal: "environment" }, width: { ideal: 1920 }, height: { ideal: 1080 } },
       audio: false
@@ -166,7 +215,6 @@
       videoTrack = stream.getVideoTracks()[0];
     }).catch(err => alert("Camera permission error: " + err));
 
-    // Camera Torch
     async function toggleTorch() {
       if (!videoTrack) return;
       try {
@@ -193,8 +241,9 @@
       setTimeout(() => { toast.style.display = 'none'; }, 1100);
     }
 
-    // Snap Frame
+    // Camera Snap to paired Laptop
     document.getElementById('snap').onclick = () => {
+      if (!targetPin) return showPinModal();
       if (!video.videoWidth) return;
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
@@ -217,8 +266,9 @@
       triggerToast('💖 Sent to Laptop ✨');
     };
 
-    // Send Any File (Video, Music, PDF, Images) to Laptop
+    // Universal File Sender
     async function sendUniversalFiles(input) {
+      if (!targetPin) return showPinModal();
       const files = Array.from(input.files);
       if (!files.length) return;
 
@@ -237,22 +287,22 @@
           reader.readAsDataURL(file);
         });
       }
-      triggerToast(`📁 ${files.length} File(s) Sent to PC ✨`);
+      triggerToast(`📁 ${files.length} File(s) Sent ✨`);
       input.value = '';
     }
 
-    // Receive Files from Laptop
+    // Inbox Receiver
     socket.on('receive_file', (file) => {
       receivedFiles.push(file);
       document.getElementById('inbox-count').innerText = receivedFiles.length;
-      triggerToast(`📥 New file from Laptop! ✨`);
+      triggerToast(`📥 File from paired PC! ✨`);
       renderInbox();
     });
 
     function renderInbox() {
       const container = document.getElementById('inboxList');
       if (!receivedFiles.length) {
-        container.innerHTML = `<p style="color: #9d174d; text-align: center; font-size: 13px;">No files received from laptop yet.</p>`;
+        container.innerHTML = `<p style="color: #9d174d; text-align: center; font-size: 13px;">No files received from this laptop yet.</p>`;
         return;
       }
       container.innerHTML = '';
